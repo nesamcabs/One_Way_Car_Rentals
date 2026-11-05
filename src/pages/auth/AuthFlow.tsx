@@ -28,12 +28,16 @@ function AuthLayout({ art, title, subtitle, children }: { art: string; title: st
       <aside className="auth__hero">
         <picture>
           <source media="(max-width: 720px)" srcSet="/website-images/web/heroes/hero-mobile.webp" />
-          <img className="auth__bg" src="/website-images/web/heroes/hero-family.webp" alt="Family traveling comfortably with One Way Car Rentals outstation taxi" width={1774} height={887} />
+          <img className="auth__bg" src="/website-images/web/heroes/hero-family.webp" alt="Family traveling comfortably with One Way Car Rentals outstation cab" width={1774} height={887} />
         </picture>
         <span className="auth__shade" aria-hidden="true" />
         <div className="auth__top">
-          <span className="brand brand--light">
-            <img src="/brand/one-way-car-rentals-logo.png" alt="One Way Car Rentals" width={132} height={44} />
+          <span className="brand brand--light brand--compact">
+            <img src="/brand/ow-icon-192.png" alt="" width={44} height={44} />
+            <span className="brand__word">
+              <b>People</b>
+              <small>Taxi</small>
+            </span>
           </span>
         </div>
         <div className="auth__hero-body">
@@ -57,7 +61,7 @@ function AuthLayout({ art, title, subtitle, children }: { art: string; title: st
           <p className="auth__sub">{subtitle}</p>
           {children}
           <p className="auth__legal">
-            Need help? Call <a href={`tel:${SUPPORT_PHONE}`}>{SUPPORT_PHONE_DISPLAY}</a>. By continuing you agree to One Way Car Rentals’ <Link to="/legal#terms" target="_blank" rel="noopener">Terms &amp; Conditions<span className="sr-only"> (opens in a new tab)</span></Link> and <Link to="/legal#privacy" target="_blank" rel="noopener">Privacy &amp; Location Policy<span className="sr-only"> (opens in a new tab)</span></Link>.
+            Need help? Call <a href={`tel:${SUPPORT_PHONE}`}>{SUPPORT_PHONE_DISPLAY}</a>. By continuing you agree to One Way Car Rentals’s <Link to="/legal#terms" target="_blank" rel="noopener">Terms &amp; Conditions<span className="sr-only"> (opens in a new tab)</span></Link> and <Link to="/legal#privacy" target="_blank" rel="noopener">Privacy &amp; Location Policy<span className="sr-only"> (opens in a new tab)</span></Link>.
           </p>
         </div>
       </main>

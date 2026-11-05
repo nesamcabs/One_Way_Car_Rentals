@@ -1,6 +1,6 @@
 // Step 2 — choose your cab: every vehicle category priced with the server's authoritative fare.
 import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import type { RideCategory } from '@core/types';
 import { quotedInclusionLine } from '@core/utils/bookingRules';
 import { SUPPORT_PHONE, SUPPORT_PHONE_DISPLAY } from '@core/config/constants';
@@ -13,7 +13,7 @@ import { useOnline } from '@/lib/hooks';
 import { categoryGroup, categoryName, categoryPhoto, type CategoryGroup } from '@/lib/categories';
 import { tripTypeLabel } from '@/lib/services';
 import { CabIcon, FuelPick, type FuelChoice } from '../../../../user/web/src/components/CabParts';
-import { BarIconButton, FareDialog, FlowBar, PromoControl } from './parts';
+import { FareDialog, FlowBar, PromoControl } from './parts';
 
 const TOO_FAR_KM = 1500;
 type Sort = 'recommended' | 'low' | 'high';
@@ -29,7 +29,7 @@ export function ChooseStep() {
   // The fuel chosen on each card (CNG is offered only on vehicles whose CNG rates the admin has saved).
   // The fuel chosen on each card. CNG is offered only on the cab types the admin enabled it for (and that have CNG rates saved).
   const [fuelPick, setFuelPick] = useState<Record<string, FuelChoice>>({});
-  const { pickup, drop, tripType, scheduledAt, tripEndAt, categoryId } = draft;
+  const { pickup, drop, tripType, scheduledAt, categoryId } = draft;
   // A Round Trip always ends back at the pickup: the drop is simply the last place visited.
   const sameAsPickup = !!pickup && !!drop && Math.abs(pickup.lat - drop.lat) < 0.0001 && Math.abs(pickup.lng - drop.lng) < 0.0001;
   const roundVia = tripType === 'Round Trip' ? [...draft.stops, ...(sameAsPickup || !drop ? [] : [drop])] : [];
@@ -66,281 +66,272 @@ export function ChooseStep() {
     const f = q.quotes.get(c.id);
     return f ? buildFareBreakup(c, f, q.outstation) : null;
   };
-  const when = scheduledAt ? `${formatDate(scheduledAt)} · ${formatTime(scheduledAt)}` : 'Pickup time not chosen';
-  const allUnavailable = !q.quoteLoading && categories.length > 0 && categories.every((c) => q.unavailable.has(c.id));
-  const loading = categoryStatus === 'loading' || (q.quoteLoading && q.quotes.size === 0);
-  const connection = !online || (!!q.quoteError && q.quotes.size === 0);
-  const noCategories = categories.length === 0 && (categoryStatus === 'unavailable' || categoryStatus === 'error');
-  const selectedHidden = !!selected && !shown.some((c) => c.id === selected.id);
 
-  const summaryFare = quote && selected && !q.unavailable.has(selected.id) ? quote.total : null;
-  const summaryLabel = canContinue ? 'Total fare' : q.quoteLoading ? 'Checking the fare…' : 'Estimated fare';
+  const handleNext = () => {
+    if (canContinue) navigate('/book/confirm');
+  };
 
   return (
-    <div className="flow-page">
+    <div className="flow-page flow-page--choose">
       <div className="wrap flow-page__wrap">
         <div className="choose">
           <div className="choose__main">
-            <section className="trip-sum trip-sum--compact" aria-label="Your trip">
+            <section className="trip-sum trip-sum--compact" aria-label="Trip summary">
               <h1 className="sr-only">Choose your vehicle</h1>
               <div className="trip-sum__body">
                 <p className="route-title">
                   <span>{pickup.name}</span>
                   <Icon name="arrow-right" size={14} />
-                  <span>{tripType === 'Round Trip' ? pickup.name : drop.id === 'place-local-disposal' ? 'Within city limits' : drop.name}</span>
+                  <span>{tripType === 'Round Trip' ? pickup.name : drop.id === 'place-local-disposal' ? 'Local City Disposal' : drop.name}</span>
                 </p>
                 {roundVia.length ? <p className="trip-sum__when">Via {roundVia.map((stop) => stop.name).join(' → ')}</p> : null}
                 <p className="trip-sum__meta">
                   <span>
-                    <Badge tone="green">{tripTypeLabel(draft.multicity ? 'Multicity' : tripType)}</Badge>
+                    <Badge variant="blue">{tripTypeLabel(draft.multicity ? 'Multicity' : tripType)}</Badge>
                   </span>
-                  <span className="trip-sum__when">{when}</span>
-                  {tripType !== 'Local Rental' ? <span>{route ? `${formatDistance(route.totalDistanceKm ?? route.distanceKm)} · about ${formatDuration(route.totalDurationMin ?? route.durationMin)}${route.estimated ? ' (estimate)' : ''}` : routeStatus === 'error' ? 'Distance unavailable' : 'Calculating distance…'}</span> : null}
-                  {tripType === 'Round Trip' && tripEndAt ? <span>Return {formatDate(tripEndAt)}, {formatTime(tripEndAt)}</span> : null}
+                  {scheduledAt ? <span className="trip-sum__when">{formatDate(scheduledAt)}, {formatTime(scheduledAt)}</span> : null}
+                  {route && tripType !== 'Local Rental' ? <span>{formatDistance(route.totalDistanceKm ?? route.distanceKm)} · about {formatDuration(route.totalDurationMin ?? route.durationMin)}</span> : null}
                 </p>
               </div>
             </section>
 
             <div className="choose__notices">
+              {!online ? (
+                <Notice variant="error" icon="warning">
+                  You are offline right now. Vehicle prices will update automatically once connection is restored.
+                </Notice>
+              ) : null}
+
               {routeStatus === 'error' ? (
                 <Notice
-                  tone="warning"
+                  variant="warning"
+                  icon="warning"
                   action={
-                    <Button size="sm" variant="secondary" onClick={retryRoute}>
-                      Try again
+                    <Button variant="secondary" size="sm" onClick={retryRoute}>
+                      Retry Route
                     </Button>
                   }
                 >
-                  We couldn’t calculate the map route on this device. Fares still come from the booking server.
+                  We couldn't get highway routing right now. Fares use direct distance until road routing reconnects.
                 </Notice>
               ) : null}
+
               {tooFar ? (
-                <Notice tone="warning">
-                  That trip is too long to book online — please <a href={`tel:${SUPPORT_PHONE}`}>call {SUPPORT_PHONE_DISPLAY}</a>.
-                </Notice>
-              ) : null}
-              {q.days ? (
-                <Notice>
-                  Round trip: {q.days} chargeable calendar day{q.days === 1 ? '' : 's'} (Indian dates from pickup to return). Daily minimum kilometres and driver allowance apply.
-                </Notice>
-              ) : null}
-              {adjustment ? (
-                <Notice>
-                  {adjustment.name}: fares include a {adjustment.percent}% {adjustment.direction === 'increase' ? 'increase' : 'reduction'}.
+                <Notice variant="warning" icon="warning">
+                  Journeys over {TOO_FAR_KM} km require a custom multi-day itinerary.{' '}
+                  <a href={`tel:${SUPPORT_PHONE}`}>Call {SUPPORT_PHONE_DISPLAY}</a> to plan with dispatch.
                 </Notice>
               ) : null}
             </div>
 
-            {noCategories ? (
-              <div className="card state-card">
-                <EmptyState
-                  icon="car"
-                  title={categoryStatus === 'error' ? 'We couldn’t load cab types' : 'Online booking isn’t available right now'}
-                  action={
-                    <a className="btn btn--primary" href={`tel:${SUPPORT_PHONE}`}>
-                      <Icon name="phone" size={17} /> Call {SUPPORT_PHONE_DISPLAY}
-                    </a>
-                  }
-                >
-                  {categoryStatus === 'error' ? 'Check your connection and try again, or call our team to book.' : `Please call ${SUPPORT_PHONE_DISPLAY} and our team will book your trip.`}
-                </EmptyState>
-              </div>
-            ) : connection ? (
-              <div className="card state-card" role="alert">
-                <EmptyState
-                  icon="offline"
-                  title="We couldn’t reach the server"
-                  action={
-                    <div className="state-card__actions">
-                      <Button icon="refresh" onClick={q.retryQuote} disabled={!online}>
-                        Try again
-                      </Button>
-                      <Button variant="secondary" onClick={() => navigate('/book')}>
-                        Change search
-                      </Button>
-                    </div>
-                  }
-                >
-                  {!online ? 'You’re offline. Fares appear as soon as you reconnect.' : q.quoteError || 'Fares could not be loaded. Check your connection and try again.'}
-                </EmptyState>
-              </div>
-            ) : loading ? (
-              <div className="searching" role="status" aria-live="polite">
-                <p className="searching__label">
-                  <span className="spinner" aria-hidden="true" /> Finding available cabs and calculating exact fares…
-                </p>
-                <ul className="cabs" aria-hidden="true">
-                  {[0, 1, 2].map((i) => (
-                    <li key={i} className="skeleton cab-skel" />
-                  ))}
-                </ul>
-              </div>
-            ) : allUnavailable ? (
-              <div className="card state-card">
-                <EmptyState
-                  icon="clock"
-                  title="No cabs available for this time"
-                  action={
-                    <div className="state-card__actions">
-                      <Button icon="clock" onClick={() => navigate('/book')}>
-                        Change time
-                      </Button>
-                      <a className="btn btn--secondary" href={`tel:${SUPPORT_PHONE}`}>
-                        <Icon name="phone" size={17} /> Call Support
-                      </a>
-                    </div>
-                  }
-                >
-                  {q.unavailable.get(categories[0]!.id) || 'Try an earlier or later pickup time, or call our support team.'}
-                </EmptyState>
-              </div>
-            ) : (
-              <>
-                {q.quoteError ? (
-                  <Notice
-                    tone="error"
-                    action={
-                      <Button size="sm" variant="secondary" icon="refresh" onClick={q.retryQuote} disabled={!online}>
-                        Try again
-                      </Button>
-                    }
-                  >
-                    We couldn’t confirm live fares. The amounts below are estimates; you can continue once confirmed.
-                  </Notice>
-                ) : null}
-                <h2 className="sr-only" id="cabs-h">
-                  Available cabs
-                </h2>
-                <ul className="cabs" role="radiogroup" aria-labelledby="cabs-h">
-                  {shown.map((c) => {
-                    const cngAlt = fuelOf(c) === 'cng' ? cngOf(c) : null;
-                    const fare = cngAlt ? cngAlt.fare : q.quotes.get(c.id);
-                    const on = c.id === categoryId;
-                    const reason = q.unavailable.get(c.id) ?? '';
-                    const blocked = tooFar || !!reason;
-                    const entry = q.entries.get(c.id);
-                    const strikeTotal = (cngAlt ? cngAlt.strikeTotal : entry?.strikeTotal) ?? 0;
-                    const strike = fare && strikeTotal > 0 && fare.total > 0 ? Math.round((fare.taxableAmount * strikeTotal) / fare.total) : 0;
-                    const incl = quotedInclusionLine(entry && cngAlt ? { ...entry, extraKmRate: cngAlt.extraKmRate } : entry, c, q.outstation);
-                    return (
-                      <li key={c.id} className={`cab ${on ? 'is-selected' : ''} ${blocked ? 'is-disabled' : ''}`}>
-                        <input id={`cab-${c.id}`} type="radio" name="cab" className="cab__radio" checked={on} disabled={blocked} onChange={() => chooseCategory(c)} />
-                        <label className="cab__label" htmlFor={`cab-${c.id}`}>
-                          <span className="cab__tick" aria-hidden="true">
-                            <Icon name="check" size={12} />
-                          </span>
-                          <span className="cab__photo">
-                            <img src={categoryPhoto(c)} alt="" width={360} height={220} loading="lazy" />
-                          </span>
-                          <span className="cab__info">
-                            <strong className="cab__name">{categoryName(c)}</strong>
-                            <span className="cab__badges">
-                              <span className="feat feat--seats">
-                                <CabIcon kind="seat" size={18} /> {c.seats} passengers
-                              </span>
-                              <span className="feat feat--ac">
-                                <CabIcon kind="ac" size={18} /> AC
-                              </span>
-                            </span>
-                          </span>
-                          <span className="cab__price">
-                            {reason ? (
-                              <span className="cab__na">{reason}</span>
-                            ) : fare ? (
-                              <>
-                                {strike > 0 ? <s className="cab__strike">{formatINR(strike)}</s> : null}
-                                <strong className="num">{formatINR(fare.taxableAmount)}</strong>
-                                <small className="cab__tax">{q.quoteLoading ? 'Confirming fare…' : fare.gst > 0 ? `+ ${formatINR(fare.gst)} GST` : ''}</small>
-                              </>
-                            ) : q.quoteLoading ? (
-                              <span className="skeleton cab__price-skel" />
-                            ) : (
-                              <small>Fare unavailable</small>
-                            )}
-                          </span>
-                        </label>
-                        {cngOf(c) && !blocked ? (
-                          <div className="cab__fuel">
-                            <FuelPick name={`fuel-${c.id}`} value={fuelOf(c)} onChange={(f) => chooseFuel(c, f)} />
-                          </div>
-                        ) : null}
-                        <div className="cab__foot">
-                          <span>{incl || 'Fare as per route distance'}</span>
-                          {fare ? (
-                            <button type="button" className="link-btn" onClick={() => setFareFor(c)}>
-                              <Icon name="chevron-right" size={13} /> Fare breakup
-                            </button>
-                          ) : null}
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-                <Notice tone="warning">
-                  Tolls, parking fees and state entry permits are paid separately by the rider against physical receipts. <Link to="/legal#payment">Fare &amp; Payment Policy</Link>
-                </Notice>
-              </>
-            )}
-          </div>
 
-          <aside className="choose__side" aria-label="Booking summary">
-            <div className="flow-card">
-              <h3 className="flow-card__title">Booking Summary</h3>
-              {selected ? (
-                <div className="flow-card__selected">
-                  <img src={categoryPhoto(selected)} alt="" className="flow-card__car-thumb" />
-                  <div>
-                    <strong>{categoryName(selected)}</strong>
-                    <p className="muted small">{selected.seats} seats · AC</p>
-                  </div>
-                </div>
-              ) : (
-                <p className="muted small">Select a vehicle from the list to continue.</p>
-              )}
-
-              <PromoControl />
-
-              {summaryFare ? (
-                <div className="flow-card__price-row">
-                  <span>{summaryLabel}</span>
-                  <strong className="num">{formatINR(summaryFare)}</strong>
-                </div>
+            <div className="cabs" role="radiogroup" aria-label="Available cabs">
+              {categoryStatus === 'loading' && categories.length === 0 ? (
+                <>
+                  <div className="skeleton cab-skel" />
+                  <div className="skeleton cab-skel" />
+                  <div className="skeleton cab-skel" />
+                </>
               ) : null}
 
-              <Button
-                block
-                size="lg"
-                trailing="arrow-right"
-                disabled={!canContinue}
-                onClick={() => navigate('/book/confirm')}
-              >
-                {selected && summaryFare ? `Book Now · ${formatINR(summaryFare)}` : 'Select a vehicle'}
-              </Button>
+              {shown.map((c) => {
+                const isSelected = c.id === categoryId;
+                const cngAlt = fuelOf(c) === 'cng' ? cngOf(c) : null;
+                const fare = cngAlt ? cngAlt.fare : q.quotes.get(c.id);
+                const unavailable = q.unavailable.has(c.id);
+                const disabled = unavailable || tooFar;
+                const photo = categoryPhoto(c);
+                const name = categoryName(c);
+                const b = breakupFor(c);
+                const entry = q.entries.get(c.id);
+                const strikeTotal = (cngAlt ? cngAlt.strikeTotal : entry?.strikeTotal) ?? 0;
+                const strike = fare && strikeTotal > 0 && fare.total > 0 ? Math.round((fare.taxableAmount * strikeTotal) / fare.total) : 0;
+                const incl = quotedInclusionLine(entry && cngAlt ? { ...entry, extraKmRate: cngAlt.extraKmRate } : entry, c, q.outstation);
+
+                return (
+                  <div
+                    key={c.id}
+                    className={`cab ${isSelected ? 'is-selected' : ''} ${disabled ? 'is-disabled' : ''}`}
+                    onClick={() => !disabled && chooseCategory(c)}
+                    role="radio"
+                    aria-checked={isSelected}
+                    tabIndex={disabled ? -1 : 0}
+                    onKeyDown={(e) => {
+                      if ((e.key === ' ' || e.key === 'Enter') && !disabled) {
+                        e.preventDefault();
+                        chooseCategory(c);
+                      }
+                    }}
+                  >
+                    <span className="cab__tick" aria-hidden="true">
+                      {isSelected ? <Icon name="check" size={13} /> : null}
+                    </span>
+
+                    <div className="cab__photo">
+                      <img src={photo} alt={c.name} loading="lazy" />
+                    </div>
+
+                    <div className="cab__info">
+                      <div className="cab__header">
+                        <h3 className="cab__name">{name}</h3>
+                        <ul className="cabx-facts">
+                          <li><CabIcon kind="seat" size={20} /> {c.seats} seats</li>
+                          <li><CabIcon kind="ac" size={20} /> AC</li>
+                          <li><CabIcon kind="bag" size={20} /> {((c as any).luggage ?? (c.seats >= 6 ? 4 : 2))} bags</li>
+                        </ul>
+                      </div>
+
+                      <ul className="cabx-rows">
+                        {incl ? <li><CabIcon kind="road" size={20} /> {incl}</li> : null}
+                      </ul>
+
+                      {cngOf(c) ? <FuelPick name={`fuel-${c.id}`} value={fuelOf(c)} onChange={(f) => !disabled && chooseFuel(c, f)} /> : null}
+
+                      {fare ? (
+                        <button
+                          type="button"
+                          className="cab__breakup-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFareFor(c);
+                          }}
+                        >
+                          <Icon name="info" size={12} /> Fare details
+                        </button>
+                      ) : null}
+
+                    </div>
+
+                    <div className="cab__price">
+                      {fare ? (
+                        <>
+                          {strike > 0 ? <s className="cab__strike">{formatINR(strike)}</s> : null}
+                          <strong>{formatINR(fare.taxableAmount)}</strong>
+                          {fare.gst > 0 ? <small className="cab__tax">+ {formatINR(fare.gst)} GST</small> : null}
+                          {fare.discount > 0 ? (
+                            <span className="cab__saving">Save {formatINR(fare.discount)}</span>
+                          ) : null}
+                        </>
+                      ) : unavailable ? (
+                        <span className="cab__na">{q.unavailable.get(c.id) || 'Unavailable for this route'}</span>
+                      ) : (
+                        <span className="cab__price-skel skeleton" />
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {shown.length === 0 && categoryStatus === 'ready' ? (
+                <EmptyState
+                  title="No vehicles match this filter"
+                  action={
+                    <Button variant="secondary" onClick={() => setGroup('All')}>
+                      Show All Vehicles
+                    </Button>
+                  }
+                >
+                  Try selecting "All Vehicles" to browse our complete driver fleet.
+                </EmptyState>
+              ) : null}
+            </div>
+          </div>
+
+          <aside className="choose__aside">
+            <div className="sel-card">
+              <div className="sel-card__top">
+                <span className="sel-card__eyebrow">Trip Summary</span>
+                <Badge variant="blue">{tripTypeLabel(draft.multicity ? 'Multicity' : tripType)}</Badge>
+              </div>
+
+              {selected ? (
+                <div className="sel-card__car">
+                  <div>
+                    <strong>{categoryName(selected)}</strong>
+                    <small className="muted">{selected.seats} seats · AC</small>
+                  </div>
+                  <img src={categoryPhoto(selected)} alt={selected.name} />
+                </div>
+              ) : (
+                <div className="sel-card__placeholder muted">Please choose a vehicle category from the list.</div>
+              )}
+
+              <dl className="sel-card__trip">
+                <div>
+                  <dt>Pickup Point</dt>
+                  <dd>{pickup.name}</dd>
+                </div>
+                <div>
+                  <dt>Destination</dt>
+                  <dd>{drop.id === 'place-local-disposal' ? 'Within City Disposal' : drop.name}</dd>
+                </div>
+                {scheduledAt ? (
+                  <div>
+                    <dt>Pickup Schedule</dt>
+                    <dd>{formatDate(scheduledAt)}, {formatTime(scheduledAt)}</dd>
+                  </div>
+                ) : null}
+              </dl>
+
+              <PromoControl
+                code={draft.promoCode}
+                applied={!!quote && quote.discount > 0}
+                onApply={(code) => update({ promoCode: code })}
+                onRemove={() => update({ promoCode: '' })}
+              />
+
+              {quote ? (
+                <>
+                  <div className="sel-card__total">
+                    <div>
+                      <span>Estimated Upfront Fare</span>
+                      {quote.discount > 0 ? (
+                        <p className="sel-card__saving">Promo applied: -{formatINR(quote.discount)}</p>
+                      ) : null}
+                    </div>
+                    <strong>{formatINR(quote.total)}</strong>
+                  </div>
+
+                  <p className="sel-card__fine">
+                    
+                  </p>
+
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    block
+                    disabled={!canContinue}
+                    onClick={handleNext}
+                    iconTrailing="arrow-right"
+                  >
+                    Book Now
+                  </Button>
+                </>
+              ) : (
+                <Button variant="primary" size="lg" block disabled>
+                  Select a Cab
+                </Button>
+              )}
             </div>
           </aside>
         </div>
-
-        <FlowBar className="only-narrow">
-          <div className="flow-bar__summary flow-bar__summary--icons">
-            <BarIconButton icon="arrow-left" label="Back to trip details" onClick={() => navigate('/book')} />
-            <Button size="lg" disabled={!canContinue} onClick={() => navigate('/book/confirm')}>
-              Continue
-            </Button>
-            <BarIconButton icon="home" label="Home" onClick={() => navigate('/book')} />
-          </div>
-        </FlowBar>
       </div>
 
-      {fareFor ? (
-        <FareDialog
-          title={`${categoryName(fareFor)} fare breakup`}
-          lines={breakupFor(fareFor)?.lines ?? []}
-          total={q.quotes.get(fareFor.id)?.total ?? 0}
-          estimated={!q.authoritative}
-          note={quotedInclusionLine(q.entries.get(fareFor.id), fareFor, q.outstation)}
-          onClose={() => setFareFor(null)}
-        />
+      <FlowBar
+        onNext={handleNext}
+        nextLabel="Continue"
+        nextDisabled={!canContinue}
+        total={quote?.total}
+        hideFare
+        onBack={() => navigate('/book')}
+        backLabel="Back to trip details"
+        onHome={() => navigate('/')}
+      />
+
+      {fareFor && breakupFor(fareFor) ? (
+        <FareDialog fare={breakupFor(fareFor)!} onClose={() => setFareFor(null)} />
       ) : null}
     </div>
   );
 }
+export default ChooseStep;

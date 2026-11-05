@@ -157,8 +157,9 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       brand: 'onewaycarrentals',
     };
   }, [draft]);
-  // The deployed quote endpoint requires authentication. Enabling the hook after account
-  // resolution starts a fresh request, even when the saved trip has not changed.
+  // The booking server only quotes for a signed-in, active rider. Until the account is ready no
+  // request is made (and no earlier answer is kept); becoming ready starts a fresh quote for the
+  // current draft even when the trip itself has not changed.
   const { state: auth } = useAuth();
   // Anything the admin changes that prices a trip (vehicle fares, the price adjustment, coupons) arrives
   // live; its fingerprint makes the quote ask the server again, so new prices show within seconds.

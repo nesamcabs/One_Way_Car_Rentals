@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useCustomerData } from '@/state/customer';
+import { useCustomerData } from '@core/context/CustomerData';
 import { Icon } from './Icon';
 
 /** The ride in progress, the next booking, or a trip waiting for a rating: one small chip in the middle of the header. */

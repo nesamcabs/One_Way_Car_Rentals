@@ -1,222 +1,219 @@
-// Service pages (/services/:slug). Editorial copy only — no prices: fares come from the booking
-// server. Kept free of runtime imports so the build-time SEO prerender can read it.
 import type { TripType } from '@core/types';
-import { IMG } from '../book/content';
 
 export interface ServiceDetail {
+  id: string;
   slug: string;
-  /** The matching service card id on the booking home. */
-  homeId: string;
   title: string;
   h1: string;
-  /** Short name for links and breadcrumbs. */
-  name: string;
   tripType: TripType;
-  imageUrl: string;
+  image: string;
   metaDescription: string;
   keywords: string;
   lead: string;
   features: Array<{ title: string; text: string }>;
   overview: string[];
-  billing: Array<{ title: string; detail: string }>;
+  pricingRules: Array<{ title: string; detail: string }>;
   faqs: Array<{ q: string; a: string }>;
 }
 
-const TOLLS = { title: 'Tolls, parking & permits', detail: 'Added to your receipt at actual cost against receipts, with no markup.' };
-const PAYMENT = { title: 'Payment', detail: 'Nothing is charged when you book. Pay your driver in cash or by UPI at the end of the trip.' };
-
 export const ALL_SERVICES: ServiceDetail[] = [
   {
+    id: 'one-way-drop-taxi',
     slug: 'one-way-drop-taxi',
-    homeId: 'one-way',
-    title: 'One Way Drop Taxi in Tamil Nadu | No Return Fare',
-    h1: 'One Way Drop Taxi Across Tamil Nadu',
-    name: 'One way drop taxi',
+    title: 'One Way Drop Taxi in Tamil Nadu | Zero Return Fare Outstation Cab',
+    h1: 'One Way Drop Taxi Across Tamil Nadu & South India',
     tripType: 'One Way',
-    imageUrl: IMG('photography/service-one-way'),
+    image: '/website-images/web/photography/service-one-way.webp',
     metaDescription:
-      'One way drop taxi between cities in Tamil Nadu, Bangalore and Pondicherry. Pay for the drop only, see every vehicle’s fare before booking, verified drivers.',
+      'Book one way drop taxi across Tamil Nadu with One Way Car Rentals. Pay only for one-way distance with zero return fare. Clean AC sedans, SUVs & Innova Crysta with verified drivers.',
     keywords:
-      'one way drop taxi, one way taxi tamil nadu, one way cab, drop taxi online booking, intercity one way cab, one way car rental with driver, outstation drop taxi',
-    lead: 'Going to another city and not coming back the same way? Book a one-way drop and pay for the trip you actually take — never for the car’s empty return.',
+      'one way drop taxi, drop taxi tamil nadu, one way cab chennai, drop taxi online booking, zero return fare cab, intercity one way taxi, outstation drop taxi',
+    lead:
+      'Pay only for the distance you travel between cities. Zero return charges, fares shown before you book, and commercial drivers who know the highways.',
     features: [
-      { title: 'No return fare', text: 'A one-way booking is priced for your drop, not for a round trip you won’t take.' },
-      { title: 'Fares before you book', text: 'Compare every vehicle — hatchback to tempo traveller — with what is and isn’t included.' },
-      { title: 'Verified drivers', text: 'Commercial drivers who know the highways, with name, phone and vehicle number shared once assigned.' },
-      { title: 'Boarding code', text: 'The trip can’t start until you share the 4-digit code shown only to you.' },
+      { title: 'Zero Return Fare', text: 'You only pay for the one-way distance from pickup to drop city. Never pay for the car’s return journey.' },
+      { title: 'Fares Shown Upfront', text: 'View exact distance fare, driver allowance, and GST before confirming. No hidden night fees.' },
+      { title: 'Pay Cash or UPI', text: 'Nothing charged upfront when you book. Pay your driver comfortably at the end of the ride.' },
+      { title: 'Boarding Security', text: '4-digit OTP boarding code ensures your trip only begins once you are seated inside the vehicle.' },
     ],
     overview: [
-      'One Way Car Rentals is built around the intercity drop: Chennai to Pondicherry, Coimbatore to Ooty, Madurai to Rameshwaram, Chennai to Bangalore and any other city pair across Tamil Nadu and the neighbouring states.',
-      'Enter your pickup and drop, choose a date and time from 30 minutes to 30 days ahead, and the booking page lists every vehicle with its fare. Once a driver is assigned you can follow them live on the map, and a receipt with the full fare breakup is saved to your trips.',
+      'Traditionally, hiring a taxi between cities meant paying double: the fare for your trip plus the return fare for the driver to return empty. One Way Car Rentals changes intercity travel with our dedicated One-Way Drop Taxi service across Tamil Nadu, Bangalore, and Pondicherry.',
+      'Our intelligent vehicle routing and vast partner fleet match vehicles with returning travellers. This allows us to charge you strictly for the one-way distance travelled, saving you 40% to 50% compared to conventional round-trip rental billing.',
+      'From solo travellers and working executives to vacationing families, choose our air-conditioned Sedans (Dzire, Etios), versatile 6-seater/7-seater SUVs (Ertiga), or spacious Innova Crysta cabs.',
     ],
-    billing: [
-      { title: 'Distance', detail: 'Priced on the one-way route between your pickup and drop.' },
-      { title: 'What’s included', detail: 'Shown on the fare screen for each vehicle before you confirm.' },
-      TOLLS,
-      PAYMENT,
+    pricingRules: [
+      { title: 'Sedan (4 Seater)', detail: '₹15 / KM + ₹400 driver allowance (minimum billing 130 KM)' },
+      { title: 'SUV 6+1 (6 Seater)', detail: '₹20 / KM + ₹400 driver allowance (minimum billing 130 KM)' },
+      { title: 'SUV 7+1 / Innova (7 Seater)', detail: '₹20 / KM + ₹400 driver allowance (minimum billing 130 KM)' },
+      { title: 'Innova Crysta (7 Seater)', detail: '₹26 / KM + ₹600 driver allowance (minimum billing 130 KM)' },
+      { title: 'Tolls & Permits', detail: 'Tolls, parking fees, and state border permits paid at actuals with receipts' },
+      { title: 'Taxes', detail: 'Standard 5% GST included in the final invoice' },
     ],
     faqs: [
       {
-        q: 'What is a one way drop taxi?',
-        a: 'A cab that takes you from one city to another without you paying for its return journey. You are billed for the one-way route only.',
+        q: 'How does One Way Car Rentals one-way drop taxi work in Tamil Nadu?',
+        a: 'You enter your pickup and drop city. We calculate the exact highway route distance and display the all-inclusive fare. You pay strictly for that one-way distance with zero return fare charges.',
       },
       {
-        q: 'Can I stop for food on the way?',
-        a: 'Yes. Short stops for meals and rest breaks are normal on intercity drops — just let your driver know.',
+        q: 'Can I stop for food or refreshments during the trip?',
+        a: 'Yes! Highway food stops and restroom breaks are permitted. Waiting time up to 30 minutes for normal breaks is completely free.',
       },
       {
-        q: 'How far ahead can I book?',
-        a: 'Pickups can be booked from 30 minutes to 30 days ahead.',
+        q: 'How far in advance do I need to book?',
+        a: 'You can book anywhere from 30 minutes to 30 days ahead. Advance bookings guarantee instant driver assignment.',
       },
     ],
   },
   {
+    id: 'outstation-round-trip',
     slug: 'outstation-round-trip',
-    homeId: 'round-trip',
-    title: 'Outstation Round Trip Cab with Driver | Multi-Day Car Rental',
-    h1: 'Outstation Round Trips with a Driver',
-    name: 'Outstation round trip',
+    title: 'Outstation Round Trip Cabs | Multi-Day Car Rental with Driver',
+    h1: 'Outstation Round Trip Car Rentals with Driver',
     tripType: 'Round Trip',
-    imageUrl: IMG('photography/service-round-trip'),
+    image: '/website-images/web/photography/service-round-trip.webp',
     metaDescription:
-      'Outstation round trip cabs with a dedicated driver for one day or several. Calendar-day billing, fares shown before you book, clean AC cars across South India.',
+      'Book outstation round trip cabs with dedicated driver across South India. Calendar-day billing, 250 km/day minimum, clean AC cars for family vacations and temple tours.',
     keywords:
-      'outstation round trip cab, outstation cab with driver, multi day car rental with driver, round trip taxi tamil nadu, family trip car rental',
-    lead: 'Out and back over one day or many, with the same car and driver throughout. Billed by calendar day, with the fare shown before you book.',
+      'outstation round trip cab, outstation car rental with driver, multi day cab booking tamil nadu, family vacation car rental, round trip taxi rate per km',
+    lead:
+      'Out and back over one day or multiple days with your dedicated driver. Transparent calendar-day billing, generous daily km limits, and complete flexibility.',
     features: [
-      { title: 'Same car, same driver', text: 'Your driver stays with you for the whole trip.' },
-      { title: 'Calendar-day billing', text: 'Simple to plan: each calendar day of the trip is a billing day.' },
-      { title: 'Your own schedule', text: 'Stop for viewpoints, temples and meals when you want to.' },
-      { title: 'Room for everyone', text: 'Sedans, SUVs and tempo travellers for families and groups.' },
+      { title: 'Dedicated Driver', text: 'The same professional driver and vehicle stays with your group throughout the journey.' },
+      { title: 'Calendar Day Billing', text: 'Simple, transparent billing based on calendar days with clear daily driver allowance.' },
+      { title: 'Sightseeing Freedom', text: 'Stop at viewpoint spots, heritage monuments, and restaurants on your own schedule.' },
+      { title: 'All-Inclusive Quotes', text: 'See your complete minimum km package and daily allowance before you confirm.' },
     ],
     overview: [
-      'Round trips suit weekend getaways to Ooty or Kodaikanal, temple circuits, weddings and business visits that take in several towns. Add your return date when booking and the fare for each vehicle covers the whole trip.',
-      'Because the car stays with you, there is no need to find a new cab at each stop — your driver waits while you sightsee, shop or attend meetings.',
+      'Whether planning a long-weekend getaway to Ooty or Kodaikanal, a family darshan tour across South Indian temples, or a business trip covering multiple industrial towns, One Way Car Rentals Outstation Round Trips provide the comfort of your own car with the relaxation of a professional driver.',
+      'Our round trips are billed by calendar day with fair daily minimum kilometre allowances (250 km/day for Sedans & SUVs, 300 km/day for Innova Crysta). Any extra kilometres travelled are charged at low standard per-km rates with zero surcharge.',
     ],
-    billing: [
-      { title: 'Calendar days', detail: 'Each calendar day from departure to return counts as one billing day.' },
-      { title: 'What’s included', detail: 'Shown on the fare screen for each vehicle before you confirm.' },
-      TOLLS,
-      PAYMENT,
+    pricingRules: [
+      { title: 'Sedan (4 Seater)', detail: '₹14 / KM + ₹400 driver allowance/day (minimum 250 KM per calendar day)' },
+      { title: 'SUV 6+1 (6 Seater)', detail: '₹19 / KM + ₹400 driver allowance/day (minimum 250 KM per calendar day)' },
+      { title: 'SUV 7+1 / Innova (7 Seater)', detail: '₹19 / KM + ₹400 driver allowance/day (minimum 250 KM per calendar day)' },
+      { title: 'Innova Crysta (7 Seater)', detail: '₹22 / KM + ₹500 driver allowance/day (minimum 300 KM per calendar day)' },
+      { title: 'Driver Accommodation', detail: 'Driver arranges their own lodging and food; you only pay the fixed daily bata' },
     ],
     faqs: [
       {
-        q: 'How is a multi-day round trip billed?',
-        a: 'By calendar day: leaving on Saturday morning and returning on Sunday evening is a two-day trip. The fare screen shows the full amount for each vehicle before you book.',
+        q: 'How does calendar day billing work for round trips?',
+        a: 'Each calendar day (12:00 AM to 11:59 PM) counts as one billing day. For example, departing Saturday morning and returning Sunday evening counts as 2 days with a 500 KM minimum billing for Sedans.',
       },
       {
-        q: 'Can I book a round trip for a single day?',
-        a: 'Yes. Set the same date for departure and return; the trip is then billed as one calendar day.',
+        q: 'Do I have to arrange hotel accommodation for the driver?',
+        a: 'No. The daily driver allowance (₹400/day for Sedan/SUV, ₹500/day for Crysta) covers the driver’s personal expenses and night stay.',
       },
     ],
   },
   {
+    id: 'airport-taxi',
     slug: 'airport-taxi',
-    homeId: 'airport',
-    title: 'Airport Taxi | Chennai, Bangalore, Coimbatore, Madurai & Trichy',
-    h1: 'Airport Taxi Pickups and Drops',
-    name: 'Airport taxi',
+    title: 'Airport Taxi Transfers | Chennai, Bangalore, Coimbatore, Madurai',
+    h1: 'Guaranteed On-Time Airport Taxi Transfers',
     tripType: 'Airport Taxi',
-    imageUrl: IMG('photography/service-airport'),
+    image: '/website-images/web/photography/service-airport.webp',
     metaDescription:
-      'Pre-booked airport taxi for Chennai, Bangalore, Coimbatore, Madurai and Trichy airports. Scheduled pickups, verified drivers, fares shown before you book.',
+      'Book reliable airport taxi pickups and drops for Chennai (MAA), Bangalore (BLR), Coimbatore (CJB), Madurai (IXM), and Trichy (TRZ) airports. Flight tracking, zero surge.',
     keywords:
-      'airport taxi chennai, chennai airport cab, bangalore airport taxi, coimbatore airport taxi, madurai airport cab, trichy airport taxi, airport drop taxi',
-    lead: 'Pickups and drops arranged before your flight, with the fare for every vehicle shown upfront and a driver you can call once assigned.',
+      'airport taxi chennai, chennai airport cab booking, bangalore airport taxi, coimbatore airport cab, madurai airport drop taxi, airport transfer zero surge',
+    lead:
+      'Never miss a flight. Guaranteed punctual pickups, flight status tracking, professional meet-and-greet, and upfront fixed package fares with zero surge pricing.',
     features: [
-      { title: 'Booked ahead', text: 'Schedule your pickup up to 30 days in advance.' },
-      { title: 'Driver details early', text: 'Name, phone and vehicle number appear on your ride page once assigned.' },
-      { title: 'Space for luggage', text: 'Choose an SUV or larger vehicle when travelling with several bags.' },
-      { title: 'Onward intercity drops', text: 'Go straight from the airport to another city — Coimbatore airport to Ooty, for example.' },
+      { title: 'Guaranteed Punctuality', text: 'Drivers arrive 15 minutes before scheduled pickup time for seamless departure.' },
+      { title: 'Zero Surge Pricing', text: 'Fixed upfront package fares regardless of peak hours, rain, or midnight timings.' },
+      { title: 'Airport Meet & Greet', text: 'Driver assists with luggage at arrival gates and guides you to the vehicle.' },
+      { title: 'Generous Boot Space', text: 'Spacious sedans and SUVs capable of handling large international and domestic luggage.' },
     ],
     overview: [
-      'We cover Chennai (MAA), Kempegowda Bengaluru (BLR), Coimbatore (CJB), Madurai (IXM) and Tiruchirappalli (TRZ) airports, for city transfers and for direct drops to other towns.',
-      'Choose the airport as your pickup or drop, set the time, and compare vehicles with their fares before you confirm.',
+      'Airport journeys demand absolute reliability. A delayed cab can mean a missed flight and spoiled plans. One Way Car Rentals Airport Transfers are designed around on-time precision.',
+      'We serve all major international and domestic airports across the southern region: Chennai Airport (MAA), Kempegowda International Airport Bengaluru (BLR), Coimbatore International Airport (CJB), Madurai Airport (IXM), and Tiruchirappalli International Airport (TRZ).',
+      'Our 20 km city base package includes 20 km of driving with extra km rates clearly shown upfront. You enjoy stress-free transit directly to and from your home, hotel, or office.',
     ],
-    billing: [
-      { title: 'Fare', detail: 'Shown for each vehicle before you confirm.' },
-      { title: 'Airport parking & tolls', detail: 'Added at actual cost against receipts.' },
-      PAYMENT,
+    pricingRules: [
+      { title: 'Sedan Airport Base', detail: '₹800 includes 20 KM, extra KM at ₹35 / KM' },
+      { title: 'SUV Airport Base', detail: '₹1,200 includes 20 KM, extra KM at ₹50 / KM' },
+      { title: 'Crysta Airport Base', detail: '₹2,000 includes 20 KM, extra KM at ₹70 / KM' },
+      { title: 'Parking & Tolls', detail: 'Airport entry parking and toll fees payable at actuals with receipts' },
     ],
     faqs: [
       {
-        q: 'Which airports do you serve?',
-        a: 'Chennai, Bengaluru, Coimbatore, Madurai and Tiruchirappalli airports, for both city transfers and intercity drops.',
+        q: 'What happens if my flight is delayed?',
+        a: 'For airport pickups, our dispatch monitors flight arrival status. When you schedule an arrival pickup, your driver adjusts arrival time accordingly.',
       },
       {
-        q: 'Will the driver help with luggage?',
-        a: 'Yes, our drivers help load and unload your bags.',
+        q: 'Can the driver assist with luggage?',
+        a: 'Yes, our verified drivers happily assist with loading and unloading your luggage.',
       },
     ],
   },
   {
+    id: 'local-rental',
     slug: 'local-rental',
-    homeId: 'local-rental',
-    title: 'Local Car Rental with Driver by the Hour | City Cab Packages',
-    h1: 'Local Car Rental with a Driver, by the Hour',
-    name: 'Local hourly rental',
+    title: 'Hourly Local Car Rental with Driver | City Disposal Packages',
+    h1: 'Hourly Local Car Rental & City Disposal with Driver',
     tripType: 'Local Rental',
-    imageUrl: IMG('photography/service-corporate'),
+    image: '/website-images/web/photography/service-corporate.webp',
     metaDescription:
-      'Hire a car with a driver by the hour within city limits — for meetings, shopping, hospital visits or family functions. Fares shown before you book.',
+      'Hire a car and driver by the hour for local city travel in Chennai, Bangalore, Coimbatore, and Madurai. Flexible 4hr, 8hr, and 12hr packages for business and shopping.',
     keywords:
-      'local car rental with driver, hourly cab rental, car with driver for a day, city cab package, local taxi by the hour chennai',
-    lead: 'A car and driver at your disposal by the hour within city limits. Make as many stops as you need while the driver waits.',
+      'hourly car rental with driver, local cab rental chennai, city taxi by hour, car disposal with driver bangalore, 8 hours 80 km cab package',
+    lead:
+      'A car with a driver, at your service within city limits. Multi-stop meetings, wedding shopping, or sightseeing with flexible hourly packages.',
     features: [
-      { title: 'Car waits for you', text: 'Your driver waits at each stop while you finish your work.' },
-      { title: 'Hourly packages', text: 'Choose the package that fits your day.' },
-      { title: 'Clean AC fleet', text: 'Well-kept cars suitable for guests, clients and family.' },
-      { title: 'Clear extras', text: 'Extra time and distance rates are shown before you confirm.' },
+      { title: 'Car at Your Disposal', text: 'Vehicle waits for you at every stop while you attend meetings or shopping.' },
+      { title: 'Flexible Packages', text: 'Choose from 1 hr / 10 km up to full-day 12 hr / 120 km packages.' },
+      { title: 'Clean Executive Fleet', text: 'Well-maintained AC cars suited for visiting clients, families, and guests.' },
+      { title: 'Transparent Extra KM/Hr', text: 'Low standard per-km and per-minute rates if you exceed package limits.' },
     ],
     overview: [
-      'Days with several stops — client meetings, wedding shopping, hospital appointments or family functions — are easier with one car for the whole day than with a string of separate cabs.',
-      'Pick a package, set your start time and pickup, and the fare for each vehicle is shown before you book.',
+      'When your day involves multiple stops across the city — such as doctor visits, corporate client meetings, wedding shopping, or family functions — hailing multiple one-off cabs is frustrating and exhausting. One Way Car Rentals Local Hourly Rentals give you a dedicated car and driver throughout your itinerary.',
+      'Your driver waits patiently at each destination and navigates city traffic while you focus on your day in air-conditioned comfort.',
     ],
-    billing: [
-      { title: 'Packages', detail: 'Billed by hourly package, with the included time and distance shown when you book.' },
-      { title: 'Extra time or distance', detail: 'Rates shown on the fare screen before you confirm.' },
-      TOLLS,
-      PAYMENT,
+    pricingRules: [
+      { title: 'Flexible Packages', detail: '1hr/10km, 2hr/20km, 4hr/40km, 8hr/80km, up to 12hr/120km' },
+      { title: 'Sedan Rates', detail: 'Base from ₹800 (includes 20km). Extra KM at ₹35/km' },
+      { title: 'SUV Rates', detail: 'Base from ₹1,200 (includes 20km). Extra KM at ₹50/km' },
+      { title: 'Crysta Rates', detail: 'Base from ₹2,000 (includes 20km). Extra KM at ₹70/km' },
     ],
     faqs: [
       {
-        q: 'Can I make multiple stops?',
-        a: 'Yes. Travel to as many places as you need within your booked hours and city limits.',
+        q: 'Can I make multiple stops within the city?',
+        a: 'Yes! The rental is completely flexible: travel to as many locations as you need within your booked hours and kilometres.',
       },
     ],
   },
   {
+    id: 'pilgrimage-tours',
     slug: 'pilgrimage-tours',
-    homeId: 'pilgrimage',
-    title: 'Temple Tour Taxi in Tamil Nadu | Pilgrimage Cab with Driver',
-    h1: 'Temple and Pilgrimage Trips by Car',
-    name: 'Temple & pilgrimage trips',
+    title: 'Tamil Nadu Temple Tours & Pilgrimage Taxi Packages | One Way Car Rentals',
+    h1: 'Tamil Nadu Temple Tours & Pilgrimage Taxi Circuits',
     tripType: 'Round Trip',
-    imageUrl: IMG('photography/service-pilgrimage'),
+    image: '/website-images/web/photography/service-pilgrimage.webp',
     metaDescription:
-      'Temple tour cabs for Rameswaram, Tirupati, Madurai Meenakshi, Palani and the Navagraha temples. Courteous drivers, fares shown before you book.',
+      'Book sacred South India temple tour cabs with One Way Car Rentals. Darshan packages to Rameshwaram, Tirupati, Navagraha, Madurai Meenakshi, Palani with respectful drivers.',
     keywords:
-      'temple tour taxi tamil nadu, pilgrimage cab, navagraha temple tour car, rameshwaram taxi, tirupati darshan cab, palani temple taxi',
-    lead: 'Darshan trips and multi-temple circuits without the travel stress, with patient drivers who are used to temple towns.',
+      'tamil nadu temple tour cab, rameshwaram pilgrimage taxi, tirupati balaji darshan cab, navagraha temple taxi package, south india spiritual tour car rental',
+    lead:
+      'Experience divine peace on sacred temple circuits. Courteous, respectful drivers familiar with temple timings, darshan queues, and holy rituals.',
     features: [
-      { title: 'Temple-town experience', text: 'Drivers familiar with temple timings and parking near the shrines.' },
-      { title: 'Easy for elders', text: 'Comfortable cars and unhurried driving for senior family members.' },
-      { title: 'Multi-day circuits', text: 'Book a round trip to keep the same car across several towns.' },
-      { title: 'Room for the family', text: 'SUVs and tempo travellers for larger groups.' },
+      { title: 'Temple Knowledge', text: 'Drivers familiar with temple pooja timings, dress codes, and car parking near shrines.' },
+      { title: 'Comfort for Seniors', text: 'Gentle driving and easy boarding for elderly parents and young children.' },
+      { title: 'Custom Circuit Planning', text: 'Design your custom darshan itinerary across multiple holy towns over several days.' },
+      { title: 'Clean & Pure Fleet', text: 'Spotlessly clean, well-sanitized vehicles for an auspicious journey.' },
     ],
     overview: [
-      'Tamil Nadu’s great temples — Madurai Meenakshi, Rameswaram, Thanjavur, Palani, the Navagraha temples around Kumbakonam — and Tirupati just across the border draw families from across the country.',
-      'For a single temple, a one-way drop may be all you need. For a circuit over several days, book a round trip so your car and driver stay with you from shrine to shrine.',
+      'Tamil Nadu is the sacred Land of Temples. From the coastal shrine of Lord Ramanatha in Rameshwaram and the soaring gopurams of Madurai Meenakshi, to the Navagraha temples of Kumbakonam and the hilltop sanctum of Palani Murugan, pilgrimage is at the heart of South Indian culture.',
+      'One Way Car Rentals specializes in dedicated pilgrimage packages. Our drivers take personal care of senior citizens, navigate near temple entrances for minimum walking, and guide your family on sacred traditions.',
     ],
-    billing: [
-      { title: 'Round trips', detail: 'Billed by calendar day, with the full fare shown before you confirm.' },
-      TOLLS,
-      PAYMENT,
+    pricingRules: [
+      { title: 'Round-Trip Outstation Rates', detail: 'Sedan at ₹14/km, SUV at ₹19/km, Crysta at ₹22/km' },
+      { title: 'Daily Minimum', detail: '250 KM per day (300 KM for Crysta)' },
+      { title: 'Driver Allowance', detail: '₹400/day (₹500/day for Crysta) covers driver day & night stay' },
     ],
     faqs: [
       {
-        q: 'Can you plan a Navagraha temple circuit?',
-        a: 'Yes. Book a round trip from Kumbakonam, Thanjavur or Trichy covering your chosen days, or call us to plan the route.',
+        q: 'Can you customize a multi-day Navagraha temple tour from Trichy or Kumbakonam?',
+        a: 'Yes, we provide 2-day and 3-day customized Navagraha temple circuits covering all 9 planetary shrines with experienced drivers.',
       },
     ],
   },
@@ -224,8 +221,6 @@ export const ALL_SERVICES: ServiceDetail[] = [
 
 export function findServiceBySlug(slug: string): ServiceDetail | undefined {
   const norm = slug.toLowerCase().replace(/_|\s+/g, '-');
-  return ALL_SERVICES.find((s) => s.slug === norm || s.homeId === norm);
+  return ALL_SERVICES.find((s) => s.slug === norm || s.id === norm);
 }
 
-/** The service page for a service card on the booking home, if one exists. */
-export const serviceSlugFor = (homeId: string): string | undefined => ALL_SERVICES.find((s) => s.homeId === homeId)?.slug;

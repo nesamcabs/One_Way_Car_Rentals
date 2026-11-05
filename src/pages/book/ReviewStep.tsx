@@ -1,6 +1,6 @@
 // Step 3 — review & confirm: trip, vehicle, contact, payment and booking request submission.
 import { useEffect, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import type { FareBreakdown as Fare } from '@core/types';
 import { useCustomerData } from '@/state/customer';
 import { createRideRequest } from '@core/services/rideService';
@@ -8,21 +8,18 @@ import { buildFareBreakup } from '@core/utils/fareBreakup';
 import { scheduleProblem, whatsappProblem } from '@core/utils/bookingRules';
 import { formatDate, formatDistance, formatDuration, formatINR, formatPhone, formatTime, isValidEmail, isValidIndianMobile } from '@core/utils/format';
 import { describeError } from '@core/utils/retry';
-import { SCHEDULED_CANCELLATION_FEE, SUPPORT_PHONE, SUPPORT_PHONE_DISPLAY } from '@core/config/constants';
 import { BackButton, Button, Checkbox, Notice, PageHead, TextField } from '@/components/ui';
 import { Icon } from '@/components/Icon';
 import { useBooking, useBookingQuote } from '@/state/Booking';
 import { useAuth } from '@/state/Auth';
 import { useOnline } from '@/lib/hooks';
 import { composeNotes, notesRoom } from '@/lib/notes';
-import { setPendingReturn } from '@/lib/pendingReturn';
-import { FREE_CANCEL_WINDOW, PolicyLinks } from '@/pages/PolicySections';
+import { PolicyLinks } from '@/pages/PolicySections';
 import { categoryName, categoryPhoto } from '@/lib/categories';
-import { BarIconButton, FareDialog, FlowBar, PromoControl } from './parts';
+import { FareDialog, FlowBar, PaymentChoice, PromoControl } from './parts';
 
 export function ReviewStep() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { profile } = useCustomerData();
   const { openLoginModal } = useAuth();
   const { draft, update, reset, route, adjustment } = useBooking();
@@ -34,28 +31,48 @@ export function ReviewStep() {
   const [tried, setTried] = useState(false);
   const [serverQuote, setServerQuote] = useState<{ key: string; fare: Fare } | null>(null);
   const [showFare, setShowFare] = useState(false);
+  const [justSignedIn, setJustSignedIn] = useState(false);
   const submittingRef = useRef(false);
   const termsRef = useRef<HTMLDivElement>(null);
 
-  const { pickup, drop, tripType, scheduledAt, tripEndAt, notes, waSame, waCode, waNumber, email, forOther, passengerName, passengerMobile, flight } = draft;
+  const {
+    pickup,
+    drop,
+    tripType,
+    scheduledAt,
+    tripEndAt,
+    payment,
+    notes,
+    waCode,
+    waNumber,
+    email,
+    forOther,
+    passengerName,
+    passengerMobile,
+    flight,
+  } = draft;
+  const waSame = true; // trip updates go to the same mobile number
   const category = q.category;
 
-  // Back from the sign-in popup: the rider had already accepted the terms before signing in.
-  const justSignedIn = !!profile && (location.state as { resumed?: boolean } | null)?.resumed === true;
+  const hadProfile = useRef(!!profile);
   useEffect(() => {
-    if (justSignedIn) setTermsAccepted(true);
-  }, [justSignedIn]);
+    if (profile && !hadProfile.current) setJustSignedIn(true);
+    hadProfile.current = !!profile;
+  }, [profile]);
 
   if (!pickup || !drop || !category || !q.quote) {
     return (
       <div className="flow-page">
         <div className="wrap flow-page__wrap review-missing">
-          <PageHead backTo="/book/ride" title="Review & confirm" />
+          <PageHead
+            back={<BackButton to="/book/ride" label="Back to vehicles" />}
+            title="Review & Confirm"
+          />
           {q.quoteLoading ? (
             <Notice>Confirming fare with One Way Car Rentals server…</Notice>
           ) : (
             <Notice
-              tone="warning"
+              variant="warning"
               action={
                 <Button size="sm" variant="secondary" onClick={() => navigate('/book/ride')}>
                   Choose your vehicle
@@ -70,25 +87,47 @@ export function ReviewStep() {
     );
   }
 
-  // A Round Trip always ends back at the pickup: the drop is simply the last place visited.
-  const sameAsPickup = Math.abs(pickup.lat - drop.lat) < 0.0001 && Math.abs(pickup.lng - drop.lng) < 0.0001;
-  const roundVia = tripType === 'Round Trip' ? [...draft.stops, ...(sameAsPickup ? [] : [drop])] : [];
   // Display only: a higher struck-out price above the fare (set in admin → Pricing → Base rates).
   const strikeOf = (draft.fuelType === 'cng' ? q.entries.get(category.id)?.cng?.strikeTotal : q.entries.get(category.id)?.strikeTotal) ?? 0;
-  const priceKey = JSON.stringify([pickup.lat, pickup.lng, drop.lat, drop.lng, tripType, scheduledAt?.toISOString() ?? null, category.id, q.coupon?.code, adjustment?.id, adjustment?.percent]);
+  const priceKey = JSON.stringify([
+    pickup.lat,
+    pickup.lng,
+    drop.lat,
+    drop.lng,
+    tripType,
+    scheduledAt?.toISOString() ?? null,
+    category.id,
+    q.coupon?.code,
+    adjustment?.id,
+    adjustment?.percent,
+  ]);
   const quote = serverQuote?.key === priceKey ? serverQuote.fare : q.quote;
   const breakup = q.breakup ?? buildFareBreakup(category, quote, q.outstation);
   const airport = tripType === 'Airport Taxi';
 
   const emailError = email.trim() && !isValidEmail(email) ? 'Enter a valid email address or leave it blank.' : '';
   const waError = whatsappProblem(waSame, waCode, waNumber);
-  const passengerError = forOther ? (!passengerName.trim() ? 'Enter the passenger’s name.' : !isValidIndianMobile(passengerMobile.replace(/\s+/g, '')) ? 'Enter the passenger’s 10-digit mobile number.' : '') : '';
-  const room = notesRoom({ flight: airport ? flight : '', passengerName: forOther ? passengerName : '', passengerMobile: forOther ? passengerMobile : '' });
+  const passengerError = forOther
+    ? !passengerName.trim()
+      ? 'Enter the passenger’s name.'
+      : !isValidIndianMobile(passengerMobile.replace(/\s+/g, ''))
+        ? 'Enter the passenger’s 10-digit mobile number.'
+        : ''
+    : '';
+  const room = notesRoom({
+    flight: airport ? flight : '',
+    passengerName: forOther ? passengerName : '',
+    passengerMobile: forOther ? passengerMobile : '',
+  });
   const termsError = tried && !termsAccepted ? 'Please accept the fare and cancellation terms to confirm.' : '';
   const blocker = !online
     ? 'You’re offline. Reconnect to book.'
     : scheduleProblem(scheduledAt) ||
-      (!q.authoritative ? (q.quoteLoading ? 'Confirming fare with One Way Car Rentals…' : q.quoteError || 'Fare confirmation required.') : '') ||
+      (!q.authoritative
+        ? q.quoteLoading
+          ? 'Confirming fare with One Way Car Rentals…'
+          : q.quoteError || 'Fare confirmation required.'
+        : '') ||
       (waError || emailError || passengerError ? 'Check your contact details below.' : '');
 
   const submit = async () => {
@@ -98,8 +137,10 @@ export function ReviewStep() {
       return;
     }
     if (!profile) {
-      setPendingReturn('/book/confirm');
-      openLoginModal({ title: 'Sign in to complete booking', subtitle: 'Enter your mobile number to send your ride request.' });
+      openLoginModal({
+        title: 'Sign in to complete booking',
+        subtitle: 'Enter your mobile number to send your ride request.',
+      });
       return;
     }
     if (blocker || submittingRef.current || !route) {
@@ -126,7 +167,7 @@ export function ReviewStep() {
         fare: quote,
         tripType,
         multicity: draft.multicity && tripType === 'Round Trip',
-        paymentMethod: 'Cash',
+        paymentMethod: payment,
         couponCode: q.coupon?.code ?? '',
         notes: fullNotes,
         scheduledAt,
@@ -156,221 +197,163 @@ export function ReviewStep() {
     }
   };
 
-  const when = scheduledAt ? `${formatDate(scheduledAt)} · ${formatTime(scheduledAt)}` : 'Pickup time';
-
   return (
-    <div className="flow-page">
+    <div className="flow-page flow-page--review">
       <div className="wrap flow-page__wrap">
-        <div className="choose">
-          <div className="choose__main">
-            <div className="flow-back">
-              <BackButton to="/book/ride" label="Back to vehicles" />
-              <h1 className="sr-only">Review and confirm booking</h1>
-            </div>
+        <h1 className="sr-only">Review and confirm booking</h1>
 
-            {justSignedIn ? (
-              <Notice tone="success">You’re signed in as {profile?.name}. Tap Confirm Booking to submit your ride request.</Notice>
-            ) : null}
+        <div className="review">
+          <div className="review__main">
+            <section className="card" aria-labelledby="rv-who-head">
+              <h2 id="rv-who-head">Passenger &amp; Contact Details</h2>
 
-            <section className="trip-sum" aria-label="Route summary">
-              <div className="trip-sum__top">
-                <span className="badge badge--green">{tripType}</span>
-                <Link to="/book" className="link-btn">
-                  <Icon name="edit" size={14} /> Edit route
-                </Link>
+              <div className="rv-grid">
+                <TextField
+                  label="Mobile number"
+                  value={profile?.phone ? formatPhone(profile.phone) : 'Sign in on booking'}
+                  readOnly
+                  disabled
+                />
+                <TextField
+                  label="Email Address"
+                  type="email"
+                  placeholder="name@example.com (optional)"
+                  value={email}
+                  error={emailError}
+                  onChange={(e) => update({ email: e.target.value })}
+                />
               </div>
-              <div className="trip-sum__route">
-                <p className="route-title">
-                  <span>{pickup.name}</span>
-                  <Icon name="arrow-right" size={16} />
-                  <span>{tripType === 'Round Trip' ? pickup.name : drop.id === 'place-local-disposal' ? 'Within city limits' : drop.name}</span>
-                </p>
-                {roundVia.length ? <p className="trip-sum__when">Via {roundVia.map((stop) => stop.name).join(' → ')}</p> : null}
-                <p className="trip-sum__when">{when}</p>
-              </div>
-              <p className="trip-sum__meta">
-                {route ? `${formatDistance(route.totalDistanceKm ?? route.distanceKm)} · about ${formatDuration(route.totalDurationMin ?? route.durationMin)}` : ''}
-                {tripType === 'Round Trip' && tripEndAt ? ` · Return ${formatDate(tripEndAt)}, ${formatTime(tripEndAt)}` : ''}
-              </p>
-            </section>
 
-            <section className="card" style={{ marginTop: 20 }}>
-              <header className="card__head">
-                <h2>Selected Vehicle</h2>
-                <Link to="/book/ride" className="link-btn">
-                  <Icon name="edit" size={14} /> Change
-                </Link>
-              </header>
-              <div className="review-car">
-                <img src={categoryPhoto(category)} alt="" className="review-car__img" width={120} height={75} />
-                <div className="review-car__info">
-                  <strong>{categoryName(category)}{draft.fuelType === 'cng' ? ' (CNG)' : ''}</strong>
-                  <p className="muted small">{category.seats} passengers · AC · Driver driven</p>
-                  <p className="review-car__price num">
-                    {strikeOf > 0 ? <s className="cab__strike">{formatINR(strikeOf)}</s> : null}
-                    <strong>{formatINR(quote.total)}</strong>
-                  </p>
-                  <p className="muted small">Includes base fare, driver bata &amp; discounts</p>
-                  <p className="muted small">Toll, State Tax &amp; Parking extra (as per actuals)</p>
-                </div>
-              </div>
-            </section>
-
-            <section className="card" style={{ marginTop: 20 }}>
-              <header className="card__head">
-                <h2>Contact Information</h2>
-              </header>
-              <div className="card__body">
-                {profile ? (
-                  <div className="review-user">
-                    <Icon name="profile" size={20} />
-                    <div>
-                      <strong>{profile.name}</strong>
-                      <p className="muted small">{formatPhone(profile.phone)}</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="review-guest">
-                    <p className="muted small">We’ll verify your mobile number via OTP when confirming your booking.</p>
-                  </div>
-                )}
-
-                <div style={{ marginTop: 14 }}>
-                  <Checkbox checked={forOther} onChange={(v) => update({ forOther: v })}>
-                    Booking for someone else?
-                  </Checkbox>
-                  {forOther ? <PolicyLinks lead="Add a passenger’s or another WhatsApp number only with their permission." ids={['privacy']} newTab /> : null}
-                  {forOther ? (
-                    <div className="grid-2" style={{ marginTop: 12 }}>
-                      <TextField
-                        label="Passenger name"
-                        value={passengerName}
-                        onChange={(e) => update({ passengerName: e.target.value })}
-                        error={tried && passengerError.includes('name') ? passengerError : undefined}
-                      />
-                      <TextField
-                        label="Passenger mobile"
-                        value={passengerMobile}
-                        placeholder="10-digit mobile"
-                        onChange={(e) => update({ passengerMobile: e.target.value })}
-                        error={tried && passengerError.includes('mobile') ? passengerError : undefined}
-                      />
-                    </div>
-                  ) : null}
-                </div>
-
-                <div style={{ marginTop: 14 }}>
-                  <Checkbox checked={waSame} onChange={(v) => update({ waSame: v })}>
-                    Receive booking updates on WhatsApp
-                  </Checkbox>
-                  {!waSame ? (
+              <div className="rv-fold">
+                <Checkbox
+                  label="Booking this ride for someone else?"
+                  checked={forOther}
+                  onChange={(checked) => update({ forOther: checked })}
+                />
+                {forOther ? <PolicyLinks lead="Add a passenger’s or another WhatsApp number only with their permission." ids={['privacy']} newTab /> : null}
+                {forOther ? (
+                  <div className="rv-grid" style={{ marginTop: 10 }}>
                     <TextField
-                      wrapperClassName="mt-sm"
-                      label="WhatsApp number"
-                      value={waNumber}
-                      placeholder="10-digit number"
-                      onChange={(e) => update({ waNumber: e.target.value })}
-                      error={tried ? waError : undefined}
+                      label="Passenger Name"
+                      placeholder="Full name"
+                      value={passengerName}
+                      error={forOther && !passengerName.trim() ? 'Passenger name is required' : ''}
+                      onChange={(e) => update({ passengerName: e.target.value })}
                     />
-                  ) : null}
-                </div>
-
-                <div style={{ marginTop: 14 }}>
-                  <TextField
-                    label="Email address (optional)"
-                    hint="For tax invoices and trip receipts"
-                    value={email}
-                    type="email"
-                    onChange={(e) => update({ email: e.target.value })}
-                    error={tried ? emailError : undefined}
-                  />
-                </div>
-
-                {airport ? (
-                  <div style={{ marginTop: 14 }}>
                     <TextField
-                      label="Flight number (optional)"
-                      hint="Helps your driver monitor arrival delays"
-                      value={flight}
-                      onChange={(e) => update({ flight: e.target.value.toUpperCase() })}
+                      label="Passenger 10-digit Mobile"
+                      placeholder="9876543210"
+                      value={passengerMobile}
+                      error={passengerError}
+                      onChange={(e) => update({ passengerMobile: e.target.value })}
                     />
                   </div>
                 ) : null}
               </div>
+
+              {airport ? (
+                <div className="rv-fold">
+                  <TextField
+                    label="Flight Number (Optional)"
+                    placeholder="e.g. 6E 214"
+                    value={flight}
+                    hint="Our driver will track flight delays and adjust pickup time automatically."
+                    onChange={(e) => update({ flight: e.target.value.toUpperCase() })}
+                  />
+                </div>
+              ) : null}
+
             </section>
 
-            <div ref={termsRef} className={`card terms-card rv-terms--page ${termsError ? 'is-invalid' : ''}`} style={{ marginTop: 20 }}>
-              <Checkbox checked={termsAccepted} onChange={(v) => setTermsAccepted(v)} invalid={!!termsError}>
-                I accept the fare breakdown and that tolls, parking and permits are paid separately. Cancellation is free while the booking is pending or more than {FREE_CANCEL_WINDOW} before pickup; after that a {formatINR(SCHEDULED_CANCELLATION_FEE)} fee applies.
-              </Checkbox>
+            <section className="card rv-policy rv-policy--page" ref={termsRef}>
+              <Checkbox
+                label="I accept the fare, extra charges and cancellation policy."
+                checked={termsAccepted}
+                onChange={setTermsAccepted}
+              />
               <PolicyLinks ids={['terms']} newTab />
-              {termsError ? <p className="field__error" role="alert" style={{ marginTop: 8 }}>{termsError}</p> : null}
-            </div>
+              {termsError ? <p className="bf-error">{termsError}</p> : null}
+            </section>
 
             {submitError ? (
-              <Notice tone="error" action={<Button size="sm" onClick={() => void submit()}>Retry</Button>}>
+              <Notice variant="error" icon="warning">
                 {submitError}
               </Notice>
             ) : null}
           </div>
 
-          <aside className="choose__side" aria-label="Review sidebar">
-            <div className="flow-card">
-              <h3 className="flow-card__title">Total Payable</h3>
-              <div className="flow-card__price-row">
-                <span>Trip Fare</span>
+          <aside className="review__sticky">
+            <section className="card" aria-labelledby="rv-pay-head">
+              <h2 id="rv-pay-head">Payment Method</h2>
+              <PaymentChoice value={payment} onChange={(p) => update({ payment: p })} />
+              <div className="rv-pay-promo">
+                <PromoControl
+                  code={draft.promoCode}
+                  applied={quote.discount > 0}
+                  onApply={(code) => update({ promoCode: code })}
+                  onRemove={() => update({ promoCode: '' })}
+                />
+              </div>
+            </section>
+
+            <div className="card sel-card sel-card--sum">
+              <div className="sel-card__total">
+                <span className="rv-total-label">
+                  Total Payable
+                  <button type="button" className="rv-info-btn" onClick={() => setShowFare(true)} aria-label="Fare details" title="Fare details">
+                    <Icon name="info" size={18} />
+                  </button>
+                </span>
                 <span style={{ display: "grid", justifyItems: "end" }}>
                   {strikeOf > 0 ? <s className="cab__strike">{formatINR(strikeOf)}</s> : null}
                   <strong className="num">{formatINR(quote.total)}</strong>
                 </span>
               </div>
-              <p className="muted small">Tolls, parking and state permits paid separately to the driver against physical slips.</p>
 
-              <button type="button" className="link-btn" onClick={() => setShowFare(true)} style={{ marginTop: 10 }}>
-                <Icon name="chevron-right" size={14} /> View detailed fare breakup
-              </button>
+              <ul className="rv-sum__notes">
+                {draft.fuelType === 'cng' ? <li>Fuel type: CNG</li> : null}
+                <li>Includes base fare, driver bata &amp; discounts</li>
+                <li>Toll, State Tax &amp; Parking extra (as per actuals)</li>
+              </ul>
 
-              <div style={{ marginTop: 20 }}>
+              <div className="rv-act">
                 <Button
-                  block
+                  variant="primary"
                   size="lg"
+                  block
+                  disabled={submitting}
                   loading={submitting}
-                  trailing="arrow-right"
-                  onClick={() => void submit()}
+                  onClick={submit}
+                  iconTrailing="check"
                 >
-                  Confirm Booking Request
+                  {profile ? 'Confirm & Book Ride' : 'Sign in to Confirm'}
                 </Button>
               </div>
             </div>
           </aside>
         </div>
-
-        <FlowBar className="only-narrow">
-          <div className="flow-bar__terms">
-            <Checkbox checked={termsAccepted} onChange={(v) => setTermsAccepted(v)} invalid={!!termsError}>
-              I accept the fare, extra charges and cancellation policy.
-            </Checkbox>
-            {termsError ? <p className="field__error" role="alert">{termsError}</p> : null}
-          </div>
-          <div className="flow-bar__summary flow-bar__summary--icons">
-            <BarIconButton icon="arrow-left" label="Back to vehicles" onClick={() => navigate('/book/ride')} />
-            <Button size="lg" loading={submitting} onClick={() => void submit()}>
-              Book &amp; Confirm
-            </Button>
-            <BarIconButton icon="home" label="Home" onClick={() => navigate('/book')} />
-          </div>
-        </FlowBar>
       </div>
 
-      {showFare ? (
-        <FareDialog
-          title={`${categoryName(category)} fare breakup`}
-          lines={breakup.lines}
-          total={quote.total}
-          estimated={!q.authoritative}
-          onClose={() => setShowFare(false)}
-        />
-      ) : null}
+      <FlowBar
+        onNext={submit}
+        nextLabel={profile ? 'Book & Confirm' : 'Sign in & Book'}
+        nextDisabled={submitting}
+        nextLoading={submitting}
+        total={quote.total}
+        hideFare
+        onBack={() => navigate('/book/ride')}
+        backLabel="Back to vehicles"
+        onHome={() => navigate('/')}
+        above={
+          <div className="flow-bar__terms">
+            <Checkbox label="I accept the fare, extra charges and cancellation policy." checked={termsAccepted} onChange={setTermsAccepted} />
+            {termsError ? <p className="bf-error">{termsError}</p> : null}
+          </div>
+        }
+      />
+
+      {showFare ? <FareDialog fare={breakup} onClose={() => setShowFare(false)} /> : null}
     </div>
   );
 }
+export default ReviewStep;

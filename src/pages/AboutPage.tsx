@@ -7,7 +7,15 @@ import { Icon } from '@/components/Icon';
 import { CONTACT } from '@/lib/contact';
 import { useSeo } from '@/lib/seo';
 import { ABOUT_SEO } from '@/seo/pages';
-import { ALL_SERVICES } from '@/pages/services/servicesData';
+
+const SERVICES = [
+  { to: '/services/one-way-drop-taxi', label: 'One-way drop taxi' },
+  { to: '/services/outstation-round-trip', label: 'Round trips' },
+  { to: '/services/airport-taxi', label: 'Airport transfers' },
+  { to: '/services/local-rental', label: 'Local rental' },
+  { to: '/services/pilgrimage-tours', label: 'Temple & pilgrimage tours' },
+  { to: '/?service=multicity', label: 'Multicity itineraries' },
+];
 
 export function AboutPage() {
   useSeo(ABOUT_SEO);
@@ -28,7 +36,7 @@ export function AboutPage() {
         <Card>
           <h2>Who we are</h2>
           <p>
-            One Way Car Rentals is a customer booking brand operated by NESAM Tours and Travels Private Limited. Every fare is shown before you book, every booking is reviewed by our team, and you pay your driver in cash or by UPI after the trip.
+            One Way Car Rentals is a customer booking brand of NESAM Tours and Travels Private Limited (&quot;A Unit of NESAM Tours and Travels Private Limited&quot;). Every fare is shown before you book, every booking is reviewed by our team, and you pay your driver in cash or by UPI after the trip.
           </p>
           <address>
             {COMPANY_LEGAL_NAME}
@@ -39,14 +47,11 @@ export function AboutPage() {
         <Card>
           <h2>What you can book</h2>
           <ul className="about-list">
-            {ALL_SERVICES.map((s) => (
-              <li key={s.slug}>
-                <Link to={`/services/${s.slug}`}>{s.name}</Link>
+            {SERVICES.map((s) => (
+              <li key={s.to}>
+                <Link to={s.to}>{s.label}</Link>
               </li>
             ))}
-            <li>
-              <Link to="/?service=multicity">Multicity itineraries</Link>
-            </li>
           </ul>
         </Card>
         <Card>

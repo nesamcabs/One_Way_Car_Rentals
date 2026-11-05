@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { useCustomerData } from '@/state/customer';
+import { useCustomerData } from '@core/context/CustomerData';
 import { formatDate, formatINR } from '@core/utils/format';
 import { paymentRows } from '@core/utils/tripView';
-import { EmptyState, LinkButton, PageHead, Button } from '@/components/ui';
+import { Button, EmptyState, LinkButton, PageHead } from '@/components/ui';
 import { Icon } from '@/components/Icon';
 import { useAuth } from '@/state/Auth';
 import { useSeo } from '@/lib/seo';
@@ -115,7 +115,7 @@ export function PaymentsPage() {
                 <li key={t.id}>
                   <Link className="pay-row" to={`/trips/${t.id}`}>
                     <span className="pay-row__main">
-                      <strong>
+                      <strong className="truncate">
                         {t.pickup.name} → {t.drop.name}
                       </strong>
                       <small className="muted">

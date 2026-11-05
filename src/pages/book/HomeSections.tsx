@@ -1,30 +1,36 @@
 // The sections under the booking console: what the site offers and why to trust it.
 // Every card either fills the console (so a visitor is one tap from fares) or links somewhere real.
-// Layout language: numbered sections, ledger rows and spec cards — a fleet-desk catalogue.
+// Layout language: centred headings, pastel cards, a bento of routes, round destination avatars and a fleet carousel.
 import { Link } from 'react-router-dom';
 import { SCHEDULED_CANCELLATION_FEE, SCHEDULED_FREE_CANCEL_BEFORE_MS, SUPPORT_PHONE, SUPPORT_PHONE_DISPLAY } from '@core/config/constants';
 import { formatINR } from '@core/utils/format';
 import { Icon } from '@/components/Icon';
 import { useBooking } from '@/state/Booking';
 import { vehicleArtUrl } from '@/lib/vehicleArt';
-import { routeSlugFor } from '../routes/routesData';
-import { serviceSlugFor } from '../services/servicesData';
 import { ASSURANCE, CORRIDORS, DESTINATIONS, FAQS, FEATURES, IMG, MORE_CORRIDORS, SERVICES, STEPS, type Corridor, type Destination, type Service } from './content';
+import { findRouteBySlug } from '../routes/routesData';
 import { categoryName } from '@/lib/categories';
 
-function SectionHead({ no, eyebrow, title, text, action, id }: { no: string; eyebrow: string; title: string; text?: string; action?: React.ReactNode; id?: string }) {
+function SectionHead({ eyebrow, title, text, action, id }: { eyebrow: string; title: string; text?: string; action?: React.ReactNode; id?: string }) {
   return (
     <header className="sec-head">
-      <span className="sec-head__no num" aria-hidden="true">
-        {no}
-      </span>
-      <div className="sec-head__text-wrap">
-        <h2 id={id}>{title}</h2>
-      </div>
-      {action ? <div className="sec-head__action">{action}</div> : null}
+      <h2 id={id}>{title}</h2>
+      {action}
     </header>
   );
 }
+
+/** A corridor's route guide, at its canonical slug (e.g. /routes/chennai-to-pondicherry). */
+const routeHref = (corridorId: string) => `/routes/${findRouteBySlug(corridorId)?.slug ?? corridorId}`;
+
+/** The marketing page for each service, where one exists. */
+const SERVICE_PAGE: Record<string, string> = {
+  'one-way': 'one-way-drop-taxi',
+  'round-trip': 'outstation-round-trip',
+  airport: 'airport-taxi',
+  'local-rental': 'local-rental',
+  pilgrimage: 'pilgrimage-tours',
+};
 
 export function TrustStrip() {
   return (
@@ -49,34 +55,36 @@ export function ServicesSection({ onPick }: { onPick: (s: Service) => void }) {
     <section className="band" aria-labelledby="sec-services" id="sec-services-band">
       <div className="wrap">
         <SectionHead
-          no="01"
           eyebrow="Ways to travel"
           id="sec-services"
           title="A ride for every kind of journey"
           text="Choose a starting point and we’ll set up your trip. You’ll see the fare for every vehicle before you book."
         />
         <ul className="services" id="services">
-          {SERVICES.map((s) => (
-            <li key={s.id} id={s.id}>
-              <button type="button" className="service" onClick={() => onPick(s)}>
-                <span className="service__media">
-                  <img src={IMG(s.image)} alt={`One Way Car Rentals - ${s.title}`} width={724} height={543} loading="lazy" />
-                </span>
-                <span className="service__body">
-                  <strong>{s.title}</strong>
-                  <span>{s.text}</span>
-                </span>
-                <span className="service__go" aria-hidden="true">
-                  <Icon name="arrow-right" size={20} />
-                </span>
-              </button>
-              {serviceSlugFor(s.id) ? (
-                <Link to={`/services/${serviceSlugFor(s.id)}`} className="route-guide">
-                  Details <Icon name="arrow-right" size={14} />
-                </Link>
-              ) : null}
-            </li>
-          ))}
+          {SERVICES.map((s) => {
+            const serviceSlug = SERVICE_PAGE[s.id] ?? null;
+            return (
+              <li key={s.id} id={s.id} className="svc">
+                <button type="button" className="service" onClick={() => onPick(s)}>
+                  <span className="service__media">
+                    <img src={IMG(s.image)} alt={`One Way Car Rentals - ${s.title}`} width={724} height={543} loading="lazy" />
+                  </span>
+                  <span className="service__body">
+                    <strong>{s.title}</strong>
+                    <span>{s.text}</span>
+                  </span>
+                  <span className="service__go" aria-hidden="true">
+                    <Icon name="arrow-right" size={20} />
+                  </span>
+                </button>
+                {serviceSlug ? (
+                  <Link to={`/services/${serviceSlug}`} className="service__more">
+                    Service details &amp; tariff <Icon name="arrow-right" size={14} />
+                  </Link>
+                ) : null}
+              </li>
+            );
+          })}
           <li className="services__call">
             <a className="service service--call" href={`tel:${SUPPORT_PHONE}`}>
               <span className="service__body">
@@ -100,7 +108,6 @@ export function RoutesSection({ onRoute }: { onRoute: (c: Corridor) => void }) {
     <section className="band band--paper" aria-labelledby="sec-routes">
       <div className="wrap">
         <SectionHead
-          no="02"
           eyebrow="Popular routes"
           id="sec-routes"
           title="Favourite drives across the south"
@@ -110,12 +117,12 @@ export function RoutesSection({ onRoute }: { onRoute: (c: Corridor) => void }) {
           {CORRIDORS.map((c) => (
             <li key={c.id} id={c.id}>
               <button type="button" className="route-card" onClick={() => onRoute(c)} aria-label={`Plan ${c.origin} to ${c.destination}, about ${c.km}`}>
-                {c.image ? <img src={IMG(c.image)} alt={`${c.origin} to ${c.destination} one way car rental route`} width={768} height={512} loading="lazy" /> : null}
+                {c.image ? <img src={IMG(c.image)} alt={`${c.origin} to ${c.destination} outstation drop taxi route`} width={768} height={512} loading="lazy" /> : null}
                 <span className="route-card__shade" aria-hidden="true" />
                 <span className="route-card__body">
                   <span className="route-card__title">
                     {c.origin}
-                    <Icon name="arrow-right" size={26} />
+                    <Icon name="arrow-right" size={22} />
                     {c.destination}
                   </span>
                   <span className="route-card__meta">
@@ -131,33 +138,20 @@ export function RoutesSection({ onRoute }: { onRoute: (c: Corridor) => void }) {
                   Plan this trip <Icon name="arrow-right" size={18} />
                 </span>
               </button>
-              {routeSlugFor(c.id) ? (
-                <Link to={`/routes/${routeSlugFor(c.id)}`} className="route-guide">
-                  Route guide <Icon name="arrow-right" size={14} />
-                </Link>
-              ) : null}
+              <Link to={routeHref(c.id)} className="route-guide">
+                Route guide &amp; tariff <Icon name="arrow-right" size={14} />
+              </Link>
             </li>
           ))}
         </ul>
-        <div className="more-routes" role="group" aria-label="More route guides">
-          {MORE_CORRIDORS.map((c) => {
-            const slug = routeSlugFor(c.id);
-            const label = (
-              <>
-                {c.origin} <Icon name="arrow-right" size={15} /> {c.destination}
-                <span className="chip__count">{c.km}</span>
-              </>
-            );
-            return slug ? (
-              <Link key={c.id} to={`/routes/${slug}`} className="chip">
-                {label}
-              </Link>
-            ) : (
-              <button key={c.id} type="button" className="chip" onClick={() => onRoute(c)}>
-                {label}
-              </button>
-            );
-          })}
+        <div className="more-routes" role="group" aria-label="More routes">
+          <span className="more-routes__label">More routes</span>
+          {MORE_CORRIDORS.map((c) => (
+            <Link key={c.id} to={routeHref(c.id)} className="chip">
+              {c.origin} <Icon name="arrow-right" size={15} /> {c.destination}
+              <span className="chip__count">{c.km}</span>
+            </Link>
+          ))}
         </div>
       </div>
     </section>
@@ -166,24 +160,24 @@ export function RoutesSection({ onRoute }: { onRoute: (c: Corridor) => void }) {
 
 export function DestinationsSection({ onPick }: { onPick: (d: Destination) => void }) {
   return (
-    <section className="band band--dest" aria-labelledby="sec-destinations" id="sec-destinations-band">
+    <section className="band" aria-labelledby="sec-destinations" id="sec-destinations-band">
       <div className="wrap">
-        <SectionHead no="03" eyebrow="Destinations" id="sec-destinations" title="Where will you go next?" text="Tap a destination to set it as your drop and pick up from there." />
+        <SectionHead eyebrow="Destinations" id="sec-destinations" title="Where will you go next?" text="Tap a destination to set it as your drop and pick up from there." />
+        <ul className="destinations" id="destinations">
+          {DESTINATIONS.map((d) => (
+            <li key={d.id} id={`destination-${d.id}`}>
+              <button type="button" className="destination" onClick={() => onPick(d)}>
+                <img src={IMG(d.image)} alt={`${d.name} outstation taxi destination - ${d.tagline}`} width={768} height={512} loading="lazy" />
+                <span className="destination__shade" aria-hidden="true" />
+                <span className="destination__body">
+                  <strong>{d.name}</strong>
+                  <small>{d.tagline}</small>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="destinations" id="destinations">
-        {DESTINATIONS.map((d) => (
-          <li key={d.id} id={`destination-${d.id}`}>
-            <button type="button" className="destination" onClick={() => onPick(d)}>
-              <img src={IMG(d.image)} alt={`${d.name} outstation taxi destination - ${d.tagline}`} width={768} height={512} loading="lazy" />
-              <span className="destination__shade" aria-hidden="true" />
-              <span className="destination__body">
-                <strong>{d.name}</strong>
-                <small>{d.tagline}</small>
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }
@@ -203,10 +197,9 @@ export function FleetSection({ onPick }: { onPick: () => void }) {
   const { categories } = useBooking();
   const live = categories.slice(0, 8);
   return (
-    <section className="band band--fleet" aria-labelledby="sec-fleet">
+    <section className="band band--paper" aria-labelledby="sec-fleet">
       <div className="wrap">
         <SectionHead
-          no="04"
           eyebrow="Our fleet"
           id="sec-fleet-title"
           title="The right vehicle for your group"
@@ -217,29 +210,29 @@ export function FleetSection({ onPick }: { onPick: () => void }) {
             </button>
           }
         />
-        <ul className="fleet" id="sec-fleet">
-          {live.length
-            ? live.map((c) => (
-                <li key={c.id} id={`vehicle-${c.id}`} className="vehicle">
-                  <img src={vehicleArtUrl(c)} alt={`One Way Car Rentals ${c.name} - ${c.seats} seater cab`} width={320} height={210} loading="lazy" />
-                  <div className="vehicle__body">
-                    <strong>{categoryName(c)}</strong>
-                    <span className="vehicle__seats">
-                      <Icon name="passengers" size={16} /> {c.seats} seats
-                    </span>
-                  </div>
-                </li>
-              ))
-            : FALLBACK_FLEET.map((v) => (
-                <li key={v.art} id={`vehicle-${v.art}`} className="vehicle">
-                  <img src={`/vehicles/${v.art}.webp`} alt={`One Way Car Rentals ${v.name} rental`} width={320} height={210} loading="lazy" />
-                  <div className="vehicle__body">
-                    <strong>{v.name}</strong>
-                  </div>
-                </li>
-              ))}
-        </ul>
       </div>
+      <ul className="fleet" id="sec-fleet">
+        {live.length
+          ? live.map((c) => (
+              <li key={c.id} id={`vehicle-${c.id}`} className="vehicle">
+                <img src={vehicleArtUrl(c)} alt={`One Way Car Rentals ${c.name} - ${c.seats} seater cab`} width={320} height={210} loading="lazy" />
+                <div className="vehicle__body">
+                  <strong>{categoryName(c)}</strong>
+                  <span className="vehicle__seats">
+                    <Icon name="passengers" size={16} /> {c.seats} seats
+                  </span>
+                </div>
+              </li>
+            ))
+          : FALLBACK_FLEET.map((v) => (
+              <li key={v.art} id={`vehicle-${v.art}`} className="vehicle">
+                <img src={`/vehicles/${v.art}.webp`} alt={`One Way Car Rentals ${v.name} rental`} width={320} height={210} loading="lazy" />
+                <div className="vehicle__body">
+                  <strong>{v.name}</strong>
+                </div>
+              </li>
+            ))}
+      </ul>
     </section>
   );
 }
@@ -248,23 +241,25 @@ export function HowSection() {
   return (
     <section className="band band--dark" aria-labelledby="sec-how" id="sec-how-band">
       <div className="wrap how">
+        <div className="how__photo">
+          <img src={IMG('photography/about-fleet')} alt="One Way Car Rentals verified drivers and premium vehicle fleet" width={1448} height={1086} loading="lazy" />
+        </div>
         <div className="how__body">
           <h2 id="sec-how">Booked in minutes. Handled with care.</h2>
           <ol className="how__steps">
             {STEPS.map((s, i) => (
               <li key={s.title}>
-                <span className="how__num num">{String(i + 1).padStart(2, '0')}</span>
-                <div>
-                  <h3>{s.title}</h3>
-                  <p>{s.text}</p>
+                <span className="how__num">{i + 1}</span>
+                <div className="how__card">
+                  <img src={IMG(s.image)} alt={s.title} width={96} height={96} loading="lazy" />
+                  <div>
+                    <h3>{s.title}</h3>
+                    <p>{s.text}</p>
+                  </div>
                 </div>
-                <img src={IMG(s.image)} alt={s.title} width={96} height={96} loading="lazy" />
               </li>
             ))}
           </ol>
-        </div>
-        <div className="how__photo">
-          <img src={IMG('photography/about-fleet')} alt="One Way Car Rentals verified drivers and premium vehicle fleet" width={1448} height={1086} loading="lazy" />
         </div>
       </div>
     </section>
@@ -278,13 +273,11 @@ export function AssuranceSection() {
         <div className="assure__collage" aria-hidden="true">
           <img className="assure__a" src={IMG('photography/trust-driver')} alt="Verified commercial driver with One Way Car Rentals" width={724} height={543} loading="lazy" />
           <img className="assure__b" src={IMG('photography/trust-interior')} alt="Clean and sanitized AC car interior" width={724} height={543} loading="lazy" />
-          <img className="assure__c" src={IMG('photography/trust-support')} alt="24/7 customer care team support" width={724} height={543} loading="lazy" />
+          <img className="assure__c" src={IMG('photography/trust-support')} alt="One Way Car Rentals 24/7 customer care team support" width={724} height={543} loading="lazy" />
         </div>
         <div className="assure__body">
-          <div className="assure__intro">
-            <h2 id="sec-safe">Built for long journeys and peace of mind</h2>
-            <p className="sec-head__text">From the moment your driver is assigned to the receipt in your inbox, every step is visible to you.</p>
-          </div>
+          <h2 id="sec-safe">Built for long journeys and peace of mind</h2>
+          <p className="sec-head__text">From the moment your driver is assigned to the receipt in your inbox, every step is visible to you.</p>
           <ul className="assure__list">
             {ASSURANCE.map((a) => (
               <li key={a.title}>
@@ -322,7 +315,7 @@ export function Banners() {
             Call us on {SUPPORT_PHONE_DISPLAY}. Cancel free until {freeHours} hour before pickup, then a {formatINR(SCHEDULED_CANCELLATION_FEE)} fee applies.
           </span>
           <span className="banner__cta">
-            <Icon name="phone" size={18} /> Call us
+            <Icon name="phone" size={18} /> Call One Way Car Rentals
           </span>
         </a>
       </div>
@@ -342,14 +335,13 @@ export function FaqSection() {
           </Link>
         </div>
         <div className="faq" id="faq">
-          {FAQS.map((f, i) => (
+          {FAQS.map((f) => (
             <details key={f.q} className="faq__item">
               <summary>
-                <span className="faq__no num" aria-hidden="true">
-                  {String(i + 1).padStart(2, '0')}
+                <span>{f.q}</span>
+                <span className="faq__icon">
+                  <Icon name="add" size={18} />
                 </span>
-                <span className="faq__q">{f.q}</span>
-                <Icon name="add" size={22} />
               </summary>
               <p>{f.a}</p>
             </details>

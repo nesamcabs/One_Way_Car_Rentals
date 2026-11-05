@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { vehicleArtFor } from './vehicleArt';
 
 describe('vehicle illustration for a ride category', () => {
-  it('maps One Way Car Rentals category names to one consistent illustration set', () => {
+  it('maps NESAM category names to one consistent illustration set', () => {
     expect(vehicleArtFor({ name: 'Mini', seats: 4 })).toBe('hatchback');
     expect(vehicleArtFor({ name: 'Sedan', seats: 4 })).toBe('sedan');
     expect(vehicleArtFor({ name: 'SUV', seats: 6 })).toBe('suv');

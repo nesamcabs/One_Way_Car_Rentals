@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { Plugin } from 'vite';
 import { FAQS, SERVICES } from '../src/pages/book/content';
-import { ALL_ROUTES, type RouteGuide } from '../src/pages/routes/routesData';
+import { ALL_ROUTES, type RouteCorridorDetail } from '../src/pages/routes/routesData';
 import { ALL_SERVICES, type ServiceDetail } from '../src/pages/services/servicesData';
 import { ABOUT_SEO, HOME_SEO, LEGAL_SEO, OFFERS_SEO, SUPPORT_SEO, routeSeo, serviceSeo } from '../src/seo/pages';
 import { SITE, escapeHtml as e, renderHeadTags, type SeoProps } from '../src/seo/site';
@@ -29,11 +29,11 @@ const faqHtml = (faqs: ReadonlyArray<{ q: string; a: string }>) => faqs.map((f) 
 const routeLinks = (except?: string) =>
   list(
     ALL_ROUTES.filter((r) => r.slug !== except).map(
-      (r) => `${link(`/routes/${r.slug}`, `${r.origin} to ${r.destination} one way taxi`)} — about ${e(r.km)}, ${e(r.duration)}`,
+      (r) => `${link(`/routes/${r.slug}`, `${r.origin} to ${r.destination} taxi`)} — about ${r.distanceKm} km, ${e(r.duration)}`,
     ),
   );
 const serviceLinks = (except?: string) =>
-  list(ALL_SERVICES.filter((s) => s.slug !== except).map((s) => `${link(`/services/${s.slug}`, s.name)} — ${e(s.lead)}`));
+  list(ALL_SERVICES.filter((s) => s.slug !== except).map((s) => `${link(`/services/${s.slug}`, s.h1)} — ${e(s.lead)}`));
 
 const nav = `<nav aria-label="Site">${list([
   link('/', 'Book a one way taxi'),
@@ -61,14 +61,16 @@ function homeBody(): string {
   );
 }
 
-function routeBody(r: RouteGuide): string {
+function routeBody(r: RouteCorridorDetail): string {
   return wrap(
     `<h1>${e(r.h1)}</h1><p>${e(r.summary)}</p>` +
-      list([`Distance: about ${e(r.km)}`, `Driving time: about ${e(r.duration)}`, `Usual route: ${e(r.highway)}`]) +
+      list([`Distance: about ${r.distanceKm} km`, `Driving time: about ${e(r.duration)}`, `Route: ${e(r.highway)}`]) +
+      `<h2>Fare chart: ${e(r.origin)} to ${e(r.destination)}</h2>` +
+      list(r.estimates.map((x) => `<strong>${e(x.category)}</strong> (${e(x.model)}, ${e(x.seats)}) — ₹${x.perKm}/km, driver allowance ₹${x.driverBata}, estimated one-way fare ₹${x.estimatedOneWay}`)) +
       `<h2>Travelling from ${e(r.origin)} to ${e(r.destination)}</h2>${r.overview.map((p) => `<p>${e(p)}</p>`).join('')}` +
       `<h2>Stops along the way</h2>${list(r.keyStops.map((s) => `<strong>${e(s.name)}</strong> — ${e(s.description)}`))}` +
       `<h2>${e(r.origin)} to ${e(r.destination)} taxi FAQs</h2>${faqHtml(r.faqs)}` +
-      `<h2>Other one way routes</h2>${routeLinks(r.slug)}`,
+      `<h2>Other popular routes</h2>${routeLinks(r.slug)}`,
   );
 }
 
@@ -77,13 +79,13 @@ function serviceBody(s: ServiceDetail): string {
     `<h1>${e(s.h1)}</h1><p>${e(s.lead)}</p>` +
       list(s.features.map((f) => `<strong>${e(f.title)}</strong> — ${e(f.text)}`)) +
       `<h2>How it works</h2>${s.overview.map((p) => `<p>${e(p)}</p>`).join('')}` +
-      `<h2>Billing</h2>${list(s.billing.map((b) => `<strong>${e(b.title)}</strong> — ${e(b.detail)}`))}` +
+      `<h2>Tariff and billing</h2>${list(s.pricingRules.map((b) => `<strong>${e(b.title)}</strong> — ${e(b.detail)}`))}` +
       `<h2>Frequently asked questions</h2>${faqHtml(s.faqs)}` +
       `<h2>Popular routes</h2>${routeLinks()}<h2>Other services</h2>${serviceLinks(s.slug)}`,
   );
 }
 
-const simpleBody = (h1: string, text: string) => wrap(`<h1>${e(h1)}</h1><p>${e(text)}</p><h2>Popular one way routes</h2>${routeLinks()}`);
+const simpleBody = (h1: string, text: string) => wrap(`<h1>${e(h1)}</h1><p>${e(text)}</p><h2>Popular routes</h2>${routeLinks()}`);
 
 function pages(): Page[] {
   return [
@@ -96,13 +98,13 @@ function pages(): Page[] {
     ...ALL_ROUTES.map((r) => ({
       path: `/routes/${r.slug}`,
       seo: routeSeo(r),
-      images: r.imageUrl ? [{ loc: r.imageUrl, title: `${r.origin} to ${r.destination} one way taxi` }] : [],
+      images: [{ loc: r.image, title: `${r.origin} to ${r.destination} taxi` }],
       body: routeBody(r),
     })),
     ...ALL_SERVICES.map((s) => ({
       path: `/services/${s.slug}`,
       seo: serviceSeo(s),
-      images: [{ loc: s.imageUrl, title: s.h1 }],
+      images: [{ loc: s.image, title: s.h1 }],
       body: serviceBody(s),
     })),
     { path: '/offers', seo: OFFERS_SEO, images: [], body: simpleBody('Offers and promo codes', OFFERS_SEO.description ?? '') },

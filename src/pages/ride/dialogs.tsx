@@ -95,7 +95,7 @@ export function CancelDialog({ trip, onClose }: { trip: TripRecord; onClose: () 
   );
 }
 
-/** Safety centre: call, text, share and alert One Way Car Rentals operations. */
+/** Safety centre: call, text, share and alert NESAM operations. */
 export function SafetyDialog({ trip, profile, location, onClose }: { trip: TripRecord; profile: UserProfile; location: LatLng | null; onClose: () => void }) {
   const [alerting, setAlerting] = useState(false);
   const [state, setState] = useState<'idle' | 'sent' | 'failed'>('idle');

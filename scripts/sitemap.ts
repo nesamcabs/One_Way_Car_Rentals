@@ -19,13 +19,13 @@ export function sitemapEntries(): SitemapEntry[] {
     { path: '/', images: [{ loc: SITE.image, title: SITE.imageAlt }], priority: '1.0', changefreq: 'weekly' },
     ...ALL_ROUTES.map((r) => ({
       path: `/routes/${r.slug}`,
-      images: r.imageUrl ? [{ loc: r.imageUrl, title: `${r.origin} to ${r.destination} one way taxi` }] : [],
+      images: [{ loc: r.image, title: `${r.origin} to ${r.destination} taxi` }],
       priority: '0.8',
       changefreq: 'monthly' as const,
     })),
     ...ALL_SERVICES.map((s) => ({
       path: `/services/${s.slug}`,
-      images: [{ loc: s.imageUrl, title: s.h1 }],
+      images: [{ loc: s.image, title: s.h1 }],
       priority: '0.8',
       changefreq: 'monthly' as const,
     })),

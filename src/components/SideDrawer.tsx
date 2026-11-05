@@ -4,7 +4,6 @@ import { useEffect, useRef, type KeyboardEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { COMPANY_LEGAL_NAME, SUPPORT_PHONE, SUPPORT_PHONE_DISPLAY } from '@core/config/constants';
 import { Icon } from './Icon';
-import { ALL_SERVICES } from '@/pages/services/servicesData';
 import { ALL_ROUTES } from '@/pages/routes/routesData';
 interface MenuLink {
   to: string;
@@ -13,16 +12,24 @@ interface MenuLink {
 
 /** The everyday links, as plain rows with an icon. */
 const QUICK: { to: string; label: string; icon: string }[] = [
-  { to: '/book', label: 'Book a cab', icon: 'car' },
-  { to: '/trips', label: 'My bookings', icon: 'trip-history' },
+  { to: '/book', label: 'Book a ride', icon: 'car' },
+  { to: '/trips', label: 'My trips', icon: 'trip-history' },
+  { to: '/account', label: 'Account', icon: 'profile' },
   { to: '/offers', label: 'Offers', icon: 'offers' },
-  { to: '/support', label: 'Help & support', icon: 'support' },
+  { to: '/support', label: 'Help & support', icon: 'help' },
 ];
 
 const GROUPS: { title: string; links: MenuLink[] }[] = [
   {
     title: 'Services',
-    links: [...ALL_SERVICES.map((s) => ({ to: `/services/${s.slug}`, label: s.name })), { to: '/?service=multicity', label: 'Multicity itineraries' }],
+    links: [
+      { to: '/services/one-way-drop-taxi', label: 'One-way drop taxi' },
+      { to: '/services/outstation-round-trip', label: 'Round trips' },
+      { to: '/services/airport-taxi', label: 'Airport transfers' },
+      { to: '/services/local-rental', label: 'Local rental' },
+      { to: '/services/pilgrimage-tours', label: 'Temple & pilgrimage tours' },
+      { to: '/?service=multicity', label: 'Multicity itineraries' },
+    ],
   },
   {
     title: 'Popular routes',

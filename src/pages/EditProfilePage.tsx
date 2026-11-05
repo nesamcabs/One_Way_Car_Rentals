@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCustomerData } from '@/state/customer';
+import { useCustomerData } from '@core/context/CustomerData';
 import { updateCustomerProfile } from '@core/services/userService';
 import { formatPhone, isValidEmail, isValidIndianMobile, isValidName, localMobile } from '@core/utils/format';
 import { describeError } from '@core/utils/retry';

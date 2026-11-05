@@ -1,107 +1,103 @@
-/* One Way Car Rentals — "Fresh and structured" theme. Loaded last.
-   Clean green on white, strong condensed capitals for headlines, flat square-edged surfaces and a firm green
-   rule across the top. Behaviour and layout stay the same as the other two customer sites. */
+/* One Way Car Rentals — "Friendly and rounded" theme. Loaded last.
+   Bright blue with soft sky tints, pill-shaped buttons, big gentle corners, bubbly shadows and gradient
+   highlights. Behaviour and layout stay the same as the other two customer sites. */
 
 :root {
-  --r-sm: 4px;
-  --r-md: 6px;
-  --r-lg: 8px;
-  --r-xl: 10px;
-  --shadow-1: 0 1px 2px rgb(15 23 19 / 0.06);
-  --shadow-2: 0 3px 10px rgb(15 23 19 / 0.07);
+  --shadow-1: 0 3px 10px rgb(var(--brand-rgb) / 0.08);
+  --shadow-2: 0 10px 28px rgb(var(--brand-rgb) / 0.14);
 }
 
-/* ── Headlines: condensed capitals ───────────────────────────────────────────────────────────────── */
+/* ── Headlines: round and heavy ──────────────────────────────────────────────────────────────────── */
 h1,
 h2,
 .display-h,
 .hx-head h2,
 .sec-heading h2 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: -0.015em;
 }
-.hx-head h2,
-.sec-heading h2,
-.routes__head .display-h,
-.why__intro .display-h,
-.faq__intro .display-h {
-  padding-left: 12px;
-  border-left: 4px solid var(--brand);
-  line-height: 1.1;
+.hx-head h2::after,
+.sec-heading h2::after,
+.routes__head .display-h::after,
+.why__intro .display-h::after,
+.faq__intro .display-h::after {
+  content: '';
+  display: block;
+  width: 44px;
+  height: 6px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: var(--brand);
 }
 
-/* ── Header: a firm green rule on top, links as small capitals ───────────────────────────────────── */
-.topbar {
-  border-top: 3px solid var(--brand);
-  box-shadow: none;
+/* ── Buttons: pills with a gradient ──────────────────────────────────────────────────────────────── */
+.btn {
+  border-radius: var(--r-ctl);
+  font-weight: 800;
 }
-.topbar__link,
-.head-action {
-  font-weight: 600;
-  letter-spacing: 0.02em;
+.btn--primary {
+  border-color: transparent;
+  background: var(--brand);
+  box-shadow: 0 10px 22px -10px rgb(var(--brand-rgb) / 0.75);
 }
-.topbar__link.is-active {
-  background: var(--brand-soft);
+.btn--primary:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+.btn--secondary {
+  border-color: var(--brand-line);
   color: var(--brand-ink);
 }
 
-/* ── Buttons: solid and flat ─────────────────────────────────────────────────────────────────────── */
-.btn {
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-.btn--primary {
-  background: var(--brand);
-  border-color: var(--brand);
-  box-shadow: none;
-}
-.btn--primary:hover:not(:disabled) {
-  background: var(--brand-hover);
-  border-color: var(--brand-hover);
-}
-
-/* ── Hero: light and open, headline in capitals ──────────────────────────────────────────────────── */
+/* ── Hero: a soft sky wash with bubbles ──────────────────────────────────────────────────────────── */
 @media (min-width: 768px) {
+  .home-hero::after {
+    background: rgb(244 249 255 / 0.82);
+  }
   .hero-copy h1 {
-    font-size: clamp(2.2rem, 1.4rem + 2.8vw, 3.9rem);
-    line-height: 1.02;
+    font-size: clamp(2rem, 1.3rem + 2.4vw, 3.4rem);
   }
   .bf {
-    border: 1px solid var(--brand-line);
-    border-bottom: 4px solid var(--brand);
-    border-radius: var(--r-lg);
-    box-shadow: 0 2px 6px rgb(15 23 19 / 0.14), 0 20px 40px -24px rgb(15 23 19 / 0.4);
+    border: 0;
+    border-radius: var(--r-xl);
+    box-shadow: 0 2px 6px rgb(15 23 42 / 0.12), 0 20px 44px -26px rgb(15 23 42 / 0.4);
   }
 }
 
-/* ── Booking form: square tabs, solid green when chosen ──────────────────────────────────────────── */
+/* ── Booking form: pill tabs with a gradient when chosen ─────────────────────────────────────────── */
 .bf-services {
-  gap: 4px;
-  border-radius: var(--r-md);
+  gap: 6px;
+  border-radius: var(--r-ctl);
+  background: var(--brand-soft);
 }
 .bf-service {
-  border-radius: var(--r-md);
+  border-radius: var(--r-ctl);
   font-weight: 700;
 }
 .bf-service.is-active {
-  border-color: var(--brand);
+  border-color: transparent;
   background: var(--brand);
   color: #fff;
-  box-shadow: none;
+  box-shadow: 0 8px 18px -8px rgb(var(--brand-rgb) / 0.8);
 }
 .bf-service.is-active .icon {
   color: #fff;
 }
+.bf-journey.tabs {
+  border-radius: var(--r-ctl);
+}
+.bf-journey.tabs .tab {
+  border-radius: var(--r-ctl);
+}
 .bf-submit {
-  min-height: 52px;
-  background-image: none;
+  min-height: 54px;
+  border-radius: var(--r-ctl);
   font-size: 1rem;
 }
+.bf-add-city {
+  border-radius: var(--r-ctl);
+}
 
-/* ── Cards: flat with a hairline edge ────────────────────────────────────────────────────────────── */
+/* ── Cards: soft and floating ────────────────────────────────────────────────────────────────────── */
 .hx-service,
 .hx-photo,
 .review-card,
@@ -109,32 +105,27 @@ h2,
 .faq__item,
 .why__list > li {
   border-radius: var(--r-lg);
-  box-shadow: none;
+  box-shadow: var(--shadow-1);
 }
 
-/* ── Footer, phone bar, floating buttons ─────────────────────────────────────────────────────────── */
-.footer {
-  border-top: 4px solid var(--brand);
-}
-.footer h2 {
-  font-family: var(--font-display);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
+/* ── Phone bar, floating buttons, menu ───────────────────────────────────────────────────────────── */
+.tabbar,
 .bottom-nav {
-  border-top: 2px solid var(--brand);
+  border-top: 0;
+  box-shadow: 0 -1px 0 var(--line);
 }
-.drawer__head {
-  border-top: 3px solid var(--brand);
+.floating-ai-launcher--people {
+  background: var(--brand);
 }
-.drawer__group summary {
-  font-family: var(--font-display);
-  font-size: 0.9375rem;
-  letter-spacing: 0.05em;
+.drawer__panel {
+  border-radius: 0 var(--r-lg) var(--r-lg) 0;
 }
 .drawer__call {
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  border-radius: var(--r-ctl);
+  background: var(--brand);
+}
+.drawer__quick a {
+  border-radius: var(--r-ctl);
 }
 
 /* Crystal clear: a flat white page, solid buttons, no glow, no moving decoration. */
@@ -197,8 +188,8 @@ h2,
 .floating-ai-launcher__pulse {
   display: none;
 }
-.floating-ai-launcher--oneway,
-.ai-chat-window--oneway .ai-chat-head {
+.floating-ai-launcher--people,
+.ai-chat-window--people .ai-chat-head {
   background: var(--brand);
 }
 
@@ -223,14 +214,14 @@ h2,
     position: absolute;
     inset: 0;
     z-index: -2;
-    background: url('/website-images/web/heroes/hero-centered.webp') 82% 100% / cover no-repeat;
+    background: url('/website-images/web/heroes/hero-desktop.webp') 58% 50% / cover no-repeat;
   }
   .home-hero::after {
     content: '';
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: rgb(240 248 243 / 0.84);
+    background: rgb(244 249 255 / 0.84);
   }
   .hero-logo {
     display: flex;
@@ -240,7 +231,7 @@ h2,
   }
   .hero-logo img {
     width: auto;
-    height: 46px;
+    height: 44px;
   }
   .topbar .brand {
     transition: opacity 0.3s ease, visibility 0.3s;
@@ -250,38 +241,11 @@ h2,
     visibility: hidden;
   }
   .hero-copy h1 {
-    font-size: clamp(1.75rem, 8vw, 2.3rem);
-    font-weight: 700;
-    line-height: 1.04;
+    font-size: clamp(1.6rem, 7.4vw, 2.1rem);
+    font-weight: 800;
+    line-height: 1.1;
     text-align: center;
   }
-  .bf {
-    border-bottom: 4px solid var(--brand);
-  }
-}
-
-/* Service buttons: each one is its own green block, with a white gap between them. */
-.bf-services {
-  gap: 6px;
-  padding: 0;
-  border-bottom: 0;
-  border-radius: 0;
-  background: #fff;
-}
-.bf-service {
-  border: 0;
-  border-radius: var(--r-md);
-  background: var(--brand);
-  color: #fff;
-}
-.bf-service:hover {
-  background: var(--brand-hover);
-  color: #fff;
-}
-.bf-service.is-active {
-  background: var(--brand-press);
-  box-shadow: inset 0 -3px 0 #fff;
-  color: #fff;
 }
 
 /* The header keeps its logo at all times; the hero logo is larger. */
@@ -297,6 +261,73 @@ html[data-hero-logo='in'] .topbar .brand {
 @media (max-width: 767.98px) {
   .hero-logo img {
     height: 62px;
+  }
+}
+
+/* Service buttons: readable text on the pale bar; the chosen one is solid blue with white text. */
+.bf-service {
+  background: transparent;
+  color: var(--brand-ink);
+}
+.bf-service:hover:not(.is-active) {
+  background: #fff;
+  color: var(--brand);
+}
+.bf-service.is-active,
+.bf-service.is-active:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* ── Layout: photo first, headline top-left, the booking bar anchored along the bottom ──────────── */
+@media (min-width: 768px) {
+  .home-hero {
+    justify-content: space-between;
+  }
+  .hero-copy {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .hero-logo {
+    justify-content: flex-start;
+    margin-inline: 0;
+  }
+  .hero-copy h1 {
+    max-width: 14ch;
+    font-size: clamp(2.4rem, 1.4rem + 3vw, 4.2rem);
+    line-height: 1.04;
+  }
+}
+
+/* Section headings are centred. */
+.sec-heading,
+.hx-head,
+.routes__head,
+.why__intro,
+.faq__intro {
+  text-align: center;
+}
+.hx-head__text {
+  margin-inline: auto;
+}
+.hx-head h2::after,
+.sec-heading h2::after,
+.routes__head .display-h::after,
+.why__intro .display-h::after,
+.faq__intro .display-h::after {
+  margin-inline: auto;
+}
+
+/* Phone bar: a floating pill instead of a full-width strip. */
+@media (max-width: 899.98px) {
+  .tabbar {
+    right: 12px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    left: 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-ctl);
+    background: #fff;
+    box-shadow: 0 6px 18px rgb(15 23 42 / 0.16);
   }
 }
 
@@ -355,100 +386,333 @@ html[data-hero-logo='in'] .topbar .brand {
   src: url('../assets/fonts/barlow-condensed-700.woff2') format('woff2');
 }
 
-/* ── Icons: bold, rounded strokes ────────────────────────────────────────────────────────────────── */
+/* ── Icons: soft rounded lines, set in tinted bubbles on the service buttons ─────────────────────── */
 .icon svg {
-  stroke-width: 2.2;
+  stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.bf-service .icon {
+  box-sizing: content-box;
+  padding: 5px;
+  border-radius: 50%;
+  background: rgb(var(--brand-rgb) / 0.1);
+}
+.bf-service.is-active .icon {
+  background: rgb(255 255 255 / 0.22);
+}
 
-/* ── Side menu: a green header band, a 2×2 grid of square shortcuts, then the lists ─────────────── */
+/* ── Side menu: a bottom sheet with rounded top corners, pill shortcuts and soft cards ───────────── */
+.drawer {
+  align-items: flex-end;
+}
 .drawer__panel {
-  width: min(88vw, 340px);
+  width: 100%;
+  height: auto;
+  max-height: 88dvh;
+  border-radius: 11px 11px 0 0;
+  box-shadow: 0 -12px 40px rgb(15 23 42 / 0.25);
+}
+.drawer__panel::before {
+  content: '';
+  flex: none;
+  align-self: center;
+  width: 44px;
+  height: 5px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: var(--line-strong);
 }
 .drawer__head {
-  padding: 12px 14px;
-  border-top: 0;
+  padding: 8px 14px 4px 20px;
   border-bottom: 0;
-  background: var(--brand);
-}
-.drawer__head > span {
-  padding: 6px 10px;
-  border-radius: var(--r-md);
-  background: #fff;
-}
-.drawer__close {
-  background: rgb(255 255 255 / 0.18);
-  color: #fff;
-}
-.drawer__close:hover {
-  background: rgb(255 255 255 / 0.3);
-  color: #fff;
 }
 .drawer__quick {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  padding: 12px;
+  padding: 6px 16px 12px;
 }
 .drawer__quick a {
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-  min-height: 84px;
-  padding: 10px 6px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  font-family: var(--font-display);
-  font-size: 0.9375rem;
-  letter-spacing: 0.05em;
-  text-align: center;
-  text-transform: uppercase;
+  min-height: 46px;
+  padding: 0 18px 0 8px;
+  border-radius: var(--r-ctl);
+  background: var(--brand-soft);
+  color: var(--brand-ink);
+  font-weight: 800;
 }
 .drawer__quick a .icon {
+  box-sizing: content-box;
+  padding: 6px;
+  border-radius: 50%;
+  background: #fff;
   color: var(--brand);
 }
 .drawer__group {
+  margin: 0 16px 8px;
   border-top: 0;
+  border-radius: 8px;
+  background: var(--sunken);
 }
 .drawer__group summary {
-  margin: 0 12px 4px;
-  padding: 0 12px;
-  border-left: 4px solid var(--brand);
-  background: var(--sunken);
+  min-height: 52px;
+  padding: 0 18px;
   color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
 }
-.drawer__links a {
-  padding-left: 22px;
+.drawer__links {
+  padding: 0 8px 10px;
 }
 .drawer__foot {
-  border-top: 4px solid var(--brand);
+  border-top: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .drawer__panel {
+    animation-name: drawer-up;
+  }
+}
+@keyframes drawer-up {
+  from {
+    translate: 0 100%;
+  }
 }
 
-/* Side menu header: white, with a thin green rule on top. */
-.drawer__head {
-  border-top: 3px solid var(--brand);
-  border-bottom: 1px solid var(--line);
-  background: #fff;
+/* Header on wide screens: while the hero shows the logo, the header leaves its own out and "Book a ride"
+   takes the first place; once the hero scrolls away the logo slides back in and the menu moves along. */
+@media (min-width: 900px) {
+  .topnav {
+    justify-content: flex-start;
+  }
+  .topbar .brand {
+    max-width: 260px;
+    overflow: hidden;
+    transition: max-width 0.4s ease, opacity 0.3s ease, visibility 0.4s;
+  }
+  html[data-hero-logo='in'] .topbar .brand {
+    max-width: 0;
+    opacity: 0;
+    visibility: hidden;
+  }
 }
-.drawer__head > span {
+
+/* The same on phones and small tablets: no header logo while the hero shows it; it slides in on scroll. */
+@media (max-width: 899.98px) {
+  .topbar__mobile {
+    margin-left: auto;
+  }
+  .topbar .brand {
+    max-width: 220px;
+    overflow: hidden;
+    transition: max-width 0.4s ease, opacity 0.3s ease, visibility 0.4s;
+  }
+  html[data-hero-logo='in'] .topbar .brand {
+    max-width: 0;
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Side menu shortcuts: a tidy 2 × 2 grid of equal pills. */
+.drawer__quick {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.drawer__quick a {
+  justify-content: flex-start;
+  gap: 8px;
+  min-width: 0;
+  padding: 0 10px 0 6px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+.drawer__quick a .icon {
+  flex: none;
+}
+
+/* ── Inner pages: plain page headers and white account cards (no banner, no rings, no gradients) ─── */
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 24px;
   padding: 0;
-  background: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+  isolation: auto;
+  overflow: visible;
 }
-.drawer__close {
-  background: var(--sunken);
+.page-head::before,
+.page-head::after {
+  display: none;
+}
+.page-head__text h1 {
+  color: var(--ink);
+  font-weight: 800;
+}
+.page-head .eyebrow {
+  background: var(--brand-soft);
+  color: var(--brand-ink);
+}
+.page-head__text p:not(.eyebrow) {
   color: var(--muted);
 }
-.drawer__close:hover {
-  background: var(--line);
+.page-head .btn--secondary {
+  --btn-bg: #fff;
+  --btn-fg: var(--ink);
+  --btn-line: var(--line-strong);
+}
+.page-head .btn--primary {
+  --btn-bg: var(--brand);
+  --btn-fg: #fff;
+  --btn-line: var(--brand);
+  box-shadow: none;
+}
+.page-head .back-link {
+  background: var(--brand-soft);
+  color: var(--brand-ink);
+}
+
+.profile-card {
+  padding: 28px 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: #fff;
+  box-shadow: none;
+  color: var(--body);
+}
+.profile-card .muted {
+  color: var(--muted);
+}
+.profile-card h2 {
   color: var(--ink);
+  font-weight: 800;
+}
+.profile-card .btn--secondary {
+  --btn-bg: #fff;
+  --btn-fg: var(--brand-ink);
+  --btn-line: var(--brand-line);
+}
+.profile-card__photo {
+  border: 3px solid var(--brand-soft);
+  box-shadow: none;
+}
+.profile-card__cam {
+  border-color: #fff;
+  background: var(--brand);
+  color: #fff;
+}
+.credit-card {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: #fff;
+  box-shadow: none;
+  color: var(--ink);
+}
+.credit-card:hover {
+  transform: none;
+  border-color: var(--brand-line);
+}
+.credit-card > .icon {
+  color: var(--brand);
+}
+.credit-card__text small {
+  color: var(--muted);
+  font-weight: 600;
+}
+.credit-card__text strong {
+  font-weight: 800;
+}
+.group > h2.eyebrow {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+}
+
+/* A page header with a back button: the button sits to the left of the title. */
+.page-head:has(> .back-btn) {
+  flex-wrap: nowrap;
+  gap: 12px;
+  justify-content: flex-start;
+}
+.page-head:has(> .back-btn) .page-head__actions {
+  margin-left: auto;
+}
+
+/* Vehicle cards on phones: the price sits right under the car image; "Fare details" is at the bottom left. */
+@media (max-width: 999.98px) {
+  .cab__info {
+    display: flex;
+    flex-direction: column;
+    grid-row: 1 / span 2;
+  }
+  .cab__breakup-btn {
+    margin-top: auto;
+    padding-top: 8px;
+  }
+  .cab__photo {
+    align-self: start;
+  }
+  .cab__price {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+    justify-content: flex-end;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+}
+
+/* Under the Confirm button: the shield on the left, two short lines of text beside it. */
+.rv-act__note {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 8px;
+  row-gap: 2px;
+  align-items: start;
+  justify-content: center;
+  text-align: left;
+}
+.rv-act__note > .icon {
+  grid-row: 1 / span 2;
+  margin-top: 2px;
+  color: var(--brand);
+}
+.rv-act__note a {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Wide screens: the total is already in the price summary on the right, so the left card does not repeat it. */
+@media (min-width: 1000px) {
+  .rv-sum__total {
+    display: none;
+  }
+}
+
+/* Hero on wide screens: the form sits close under the headline. */
+@media (min-width: 768px) {
+  .home-hero {
+    justify-content: center;
+    gap: clamp(18px, 2.4vw, 32px);
+  }
 }
 
 /* ── Booking done: the success mark (a ring that draws, a disc that pops, a tick, ripples, confetti) ── */
 .success-burst {
   --sb: var(--brand);
-  --sb-gold: #f5b514;
-  --sb-soft: #9dd4b3;
+  --sb-gold: var(--sun);
+  --sb-soft: var(--brand-line);
   position: relative;
   display: grid;
   place-items: center;
@@ -604,11 +868,11 @@ html[data-hero-logo='in'] .topbar .brand {
   }
 }
 
-/* Booking review: the back arrow alone at the top (the page heading is hidden text). */
-.flow-back {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
+/* Phones: the bottom bar already switches between Outstation, Airport Taxi, Local Rental and Multicity, so the same choices are not repeated above the form. */
+@media (max-width: 899.98px) {
+  .bf-services {
+    display: none;
+  }
 }
 
 /* Choose-vehicle trip summary: one compact row. Back arrow left; the route in bold; type, date and distance in one small line. */
@@ -619,6 +883,7 @@ html[data-hero-logo='in'] .topbar .brand {
   gap: 0 12px;
   margin-bottom: 14px;
   padding: 10px 14px;
+  border-radius: 7px;
 }
 .trip-sum--compact .back-btn {
   width: 36px;
@@ -632,9 +897,13 @@ html[data-hero-logo='in'] .topbar .brand {
 .trip-sum.trip-sum--compact .route-title {
   gap: 1px 6px;
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.25;
   letter-spacing: -0.01em;
+}
+.trip-sum.trip-sum--compact .route-title .icon {
+  width: 13px;
+  height: 13px;
 }
 .trip-sum.trip-sum--compact .trip-sum__meta {
   display: flex;
@@ -653,17 +922,288 @@ html[data-hero-logo='in'] .topbar .brand {
   font-size: 0.6875rem;
 }
 .trip-sum--compact .trip-sum__meta > span + span::before {
-  content: '';
-  display: inline-block;
-  width: 1px;
   height: 10px;
   margin: 0 8px;
-  background: var(--line-strong, var(--line));
-  vertical-align: -1px;
 }
 .trip-sum--compact .trip-sum__when {
   color: var(--ink);
   font-weight: 600;
+}
+
+/* Booking review: the back arrow alone at the top (the page heading is hidden text). */
+.flow-back {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* Review summary card: route, one line for date and distance, the cab, then the total with two short notes. */
+.rv-sum {
+  gap: 8px;
+}
+.rv-sum .route-title--lg {
+  gap: 2px 8px;
+  font-size: 1.1875rem;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.rv-sum .route-title--lg .icon {
+  width: 15px;
+  height: 15px;
+}
+.rv-sum .rv-sum__when {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+.rv-sum .rv-sum__when .icon {
+  flex: none;
+  margin-top: 2px;
+}
+.rv-sum .rv-sum__car {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  margin: 2px 0 0;
+  padding: 0;
+  border: 0;
+  font-size: 0.9375rem;
+}
+.rv-sum .rv-sum__car strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+.rv-sum .rv-sum__car span {
+  color: var(--muted);
+}
+.rv-sum .rv-sum__car span::before {
+  content: '·';
+  margin-right: 8px;
+}
+.rv-sum .rv-sum__total {
+  display: block;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.rv-sum .rv-sum__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.rv-sum .rv-sum__label {
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 700;
+}
+.rv-sum .rv-sum__amount {
+  font-size: 1.625rem !important;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.rv-sum .rv-sum__notes {
+  display: grid;
+  gap: 2px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+/* Review form: no divider lines between the checkbox and the fields around it; spacing does the separating. */
+.rv-fold {
+  padding-top: 10px;
+  border-top: 0;
+}
+
+/* Payment card: room under the heading, and a little air between the option title and its line. */
+#rv-pay-head {
+  margin-bottom: 14px;
+}
+.pay-opt__text {
+  display: grid;
+  gap: 4px;
+}
+
+/* Fare card beside the form: the total, two small links, one button, one small support line. */
+.sel-card.sel-card--sum {
+  gap: 12px;
+  padding: 16px;
+}
+.sel-card--sum .sel-card__total {
+  align-items: baseline;
+}
+.sel-card--sum .sel-card__total span {
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 700;
+}
+.sel-card--sum .sel-card__total strong {
+  font-size: 1.5rem;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.sel-card--sum .rv-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 16px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.sel-card--sum .rv-links .link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.sel-card--sum .rv-act {
+  display: grid;
+  gap: 8px;
+}
+.sel-card--sum .rv-act .btn {
+  min-height: 48px;
+  font-size: 1rem;
+}
+.sel-card--sum .rv-act__note {
+  display: block;
+  margin: 0;
+  text-align: center;
+  font-size: 0.8125rem;
+}
+
+/* Phones and tablets: the Confirm button lives in the bottom bar, so the fare card does not repeat it.
+   On desktop (no bottom bar) the card's button stays; it is the only one. */
+@media (max-width: 999.98px) {
+  .sel-card--sum .rv-act .btn {
+    display: none;
+  }
+  .sel-card--sum .rv-act {
+    gap: 0;
+  }
+}
+
+/* Review summary card, tidied: the back arrow sits inside the card beside the route; date and distance read as two clean chunks. */
+.rv-sum .rv-sum__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rv-sum .rv-sum__head .back-btn {
+  width: 36px;
+  height: 36px;
+}
+.rv-sum .rv-sum__head .route-title {
+  margin: 0;
+  min-width: 0;
+}
+.rv-sum .rv-sum__when {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  padding-left: 48px;
+}
+.rv-sum .rv-sum__when .icon {
+  display: none;
+}
+.rv-sum .rv-sum__when > span {
+  white-space: nowrap;
+}
+.rv-sum .rv-sum__car {
+  justify-content: flex-start;
+  padding-left: 48px;
+}
+.rv-sum .rv-sum__total {
+  margin-top: 8px;
+}
+
+/* Review summary card has no back button now: the date and cab lines line up with the route. */
+.rv-sum .rv-sum__when,
+.rv-sum .rv-sum__car {
+  padding-left: 0;
+}
+
+/* The example cars under a vehicle name ("Dzire / Etios or similar"). */
+.cab__model {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--fs-xs);
+  line-height: 1.3;
+}
+
+/* Review summary: three aligned detail rows (date, distance, cab), each with a small icon. */
+.rv-sum .rv-meta {
+  display: grid;
+  gap: 8px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.rv-sum .rv-meta li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text, var(--ink));
+  font-size: 0.9375rem;
+  line-height: 1.35;
+}
+.rv-sum .rv-meta .icon {
+  flex: none;
+  color: var(--brand);
+}
+.rv-sum .rv-meta strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+.rv-sum .rv-sum__head {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.rv-sum .rv-sum__total {
+  margin-top: 12px;
+}
+
+/* Bottom bar: Back (left) and Home (right) as square icon buttons around the main button. */
+.flow-bar .flow-bar__total--with-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.flow-bar .flow-bar__total--with-icons .btn {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+.flow-bar__icon {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid var(--line-strong, var(--line));
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+.flow-bar__icon:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+.flow-bar__icon:active {
+  background: var(--brand-soft, var(--brand-soft));
 }
 
 /* Policy links under the terms checkbox: a tidy two-column list, no dots between them, nothing hanging at a line end. */
@@ -689,53 +1229,25 @@ html[data-hero-logo='in'] .topbar .brand {
   }
 }
 
-/* Bottom bar: Back and Home icon buttons around one clear, bold main button. */
-.flow-bar .flow-bar__summary--icons {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* Terms: the checkbox and one link under it. */
+.rv-policy .policy-links {
+  display: block;
+  margin: 6px 0 0 34px;
 }
-.flow-bar .flow-bar__summary--icons .btn {
-  flex: 1 1 auto;
-  width: auto;
-  min-width: 0;
+
+/* Choose-vehicle trip card has no back button now (Back is in the bottom bar): one column. */
+.trip-sum.trip-sum--compact {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* The main bottom-bar button: bold, full width, soft corners, no arrow. */
+.flow-bar .flow-bar__total--with-icons .btn {
   min-height: 52px;
-  padding: 0 20px;
-  border-radius: 12px;
+  border-radius: 6px;
   font-size: 1.0625rem;
   font-weight: 700;
   letter-spacing: 0;
   box-shadow: none;
-}
-
-.flow-bar__icon {
-  flex: none;
-  display: inline-grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  border: 1px solid var(--line-strong, var(--line));
-  border-radius: 12px;
-  background: #fff;
-  color: var(--ink);
-  cursor: pointer;
-}
-.flow-bar__icon:hover {
-  border-color: var(--brand, var(--red));
-  color: var(--brand, var(--red));
-}
-.flow-bar__icon:active {
-  background: var(--sunken, #f1f2f5);
-}
-
-/* The trip card has no back button now (Back is in the bottom bar). */
-.trip-sum.trip-sum--compact {
-  grid-template-columns: minmax(0, 1fr);
-}
-/* Terms: the checkbox and one link under it. */
-.rv-policy .policy-links {
-  display: block;
-  margin: 8px 0 0;
 }
 
 /* Terms checkbox: on phones and tablets it sits in the bottom bar, right above the Book & Confirm button; the page copy is for desktop. */
@@ -783,6 +1295,18 @@ html[data-hero-logo='in'] .topbar .brand {
   background-size: 12px;
 }
 
+/* The two notes now sit under the total in the fare card. */
+.sel-card--sum .rv-sum__notes {
+  display: grid;
+  gap: 2px;
+  margin: -4px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
 /* Vehicle card price: the amount on the right, the "+ ₹… GST" line directly under it, both right-aligned. */
 .cab__price {
   display: flex;
@@ -809,9 +1333,64 @@ html[data-hero-logo='in'] .topbar .brand {
   order: 2;
 }
 
-/* The fuel picker row under a vehicle card's main part. */
-.cab__fuel {
-  padding: 0 14px 10px;
+/* Fare card, smaller: lighter total, tighter notes and links, a small support line. */
+.sel-card.sel-card--sum {
+  gap: 8px;
+  padding: 12px 14px;
+}
+.sel-card--sum .sel-card__total span {
+  font-size: 0.875rem;
+}
+.sel-card--sum .sel-card__total strong {
+  font-size: 1.1875rem;
+}
+.sel-card--sum .rv-sum__notes {
+  margin: -2px 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+}
+.sel-card--sum .rv-links {
+  gap: 4px 12px;
+  padding: 8px 0;
+}
+.sel-card--sum .rv-links .link-btn,
+.sel-card--sum .rv-links .promo .link-btn {
+  font-size: 0.75rem;
+}
+.sel-card--sum .rv-act__note {
+  font-size: 0.6875rem;
+}
+
+/* One Way / Round Trip (and the airport To / From switch): centred in the form, in capital letters. */
+.bf-journey.tabs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+.bf-journey.tabs .tab {
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+@media (max-width: 767.98px) {
+  .bf-journey.tabs {
+    width: 100%;
+  }
+}
+
+/* The words sit exactly in the middle of each One Way / Round Trip pill. */
+.bf-journey.tabs .tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-inline: 18px;
+  text-align: center;
 }
 
 /* ── Booking form, soft raised style ─────────────────────────────────────────────────────────────────────────
@@ -819,7 +1398,7 @@ html[data-hero-logo='in'] .topbar .brand {
    a "Tomorrow" tag on the date, and a round swap button between the two places. Every colour comes from the
    site's own accent (--brand, or --red on NESAM), so the same form looks right in each theme. Flat colours only. */
 .bf.bf {
-  --bfx: var(--brand, var(--red, #1665e8));
+  --bfx: var(--brand, var(--red, #0d8a45));
   --bfx-raise: 8px 10px 20px -10px rgb(15 23 42 / 0.22), -6px -6px 14px rgb(255 255 255 / 0.95);
   background: color-mix(in srgb, var(--bfx) 6%, #fff);
 }
@@ -833,13 +1412,13 @@ html[data-hero-logo='in'] .topbar .brand {
   margin: 0 auto;
   padding: 6px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--r-ctl);
   background: color-mix(in srgb, var(--bfx) 13%, #fff);
   box-shadow: inset 3px 3px 8px rgb(15 23 42 / 0.1), inset -3px -3px 8px rgb(255 255 255 / 0.7);
 }
 .bf .bf-journey.tabs .tab {
   min-height: 48px;
-  border-radius: 999px;
+  border-radius: var(--r-ctl);
   background: transparent;
   box-shadow: none;
   color: color-mix(in srgb, var(--bfx) 55%, var(--ink, #20252d));
@@ -885,7 +1464,7 @@ html[data-hero-logo='in'] .topbar .brand {
   min-height: 76px;
   padding: 12px 16px 12px 20px;
   border: 0;
-  border-radius: 20px;
+  border-radius: 8px;
   background: #fff;
   box-shadow: var(--bfx-raise);
 }
@@ -990,7 +1569,7 @@ html[data-hero-logo='in'] .topbar .brand {
   min-height: 60px;
   padding: 0 16px;
   border: 1.5px solid color-mix(in srgb, var(--bfx) 22%, #cfd6e4);
-  border-radius: 20px;
+  border-radius: 8px;
   background: transparent;
   box-shadow: none;
   color: var(--ink, #20252d);
@@ -1018,7 +1597,7 @@ html[data-hero-logo='in'] .topbar .brand {
   min-height: 60px;
   padding: 0 18px;
   border: 0;
-  border-radius: 20px;
+  border-radius: 8px;
   background: #fff;
   box-shadow: var(--bfx-raise);
   color: var(--ink, #20252d);
@@ -1049,7 +1628,7 @@ html[data-hero-logo='in'] .topbar .brand {
    red pin, a drop card set in from the pickup card, a round swap button between them, an outlined date with a tag on its
    edge and a raised time card. Colours follow each site's accent. */
 .bf.bf {
-  --bfx: var(--brand, var(--red, #1665e8));
+  --bfx: var(--brand, var(--red, #0d8a45));
   --bfx-bg: color-mix(in srgb, var(--bfx) 7%, #eceff5);
   --bfx-raise: 7px 7px 16px rgb(15 23 42 / 0.13), -6px -6px 14px rgb(255 255 255 / 0.92);
   background: var(--bfx-bg);
@@ -1094,7 +1673,7 @@ html[data-hero-logo='in'] .topbar .brand {
 .bf .bf-form .bf-route .bf-field {
   min-height: 76px;
   padding: 12px 18px 12px 20px;
-  border-radius: 22px;
+  border-radius: 9px;
   background: var(--bfx-bg);
   box-shadow: var(--bfx-raise);
 }
@@ -1147,7 +1726,7 @@ html[data-hero-logo='in'] .topbar .brand {
 .bf .bf-datewrap .bf-input {
   min-height: 52px;
   padding: 0 14px;
-  border-radius: 20px;
+  border-radius: 8px;
   font-size: 1.0625rem;
   font-weight: 600;
 }
@@ -1161,7 +1740,7 @@ html[data-hero-logo='in'] .topbar .brand {
 .bf .bf-form .bf-row .bf-time {
   min-height: 52px;
   padding: 0 18px;
-  border-radius: 20px;
+  border-radius: 8px;
   background: var(--bfx-bg);
   font-size: 1.0625rem;
   font-weight: 600;
@@ -1193,7 +1772,7 @@ html[data-hero-logo='in'] .topbar .brand {
    No shadows. A white panel; cards are told apart by a thin line in the site's accent. The green start dot has a ring,
    the drop is a red map pin, the swap is two arrows, the date has the dotted calendar and the time a solid clock. */
 .bf.bf {
-  --bfx: var(--brand, var(--red, #1665e8));
+  --bfx: var(--brand, var(--red, #0d8a45));
   --bfx-line: color-mix(in srgb, var(--bfx) 16%, #d9dfe9);
   --bfx-bg: #fff;
   --bfx-raise: none;
@@ -1238,7 +1817,7 @@ html[data-hero-logo='in'] .topbar .brand {
   min-height: 64px;
   padding: 9px 14px 9px 16px;
   border: 1px solid var(--bfx-line);
-  border-radius: 18px;
+  border-radius: 7px;
   background: #fff;
   box-shadow: none;
 }
@@ -1299,7 +1878,7 @@ html[data-hero-logo='in'] .topbar .brand {
   min-height: 48px;
   padding: 0 46px 0 14px;
   border: 1px solid var(--bfx-line);
-  border-radius: 18px;
+  border-radius: 7px;
   font-size: 1rem;
 }
 .bf .bf-datewrap .bf-input::-webkit-calendar-picker-indicator {
@@ -1333,7 +1912,7 @@ html[data-hero-logo='in'] .topbar .brand {
   min-height: 48px;
   padding: 0 14px 0 16px;
   border: 1px solid var(--bfx-line);
-  border-radius: 18px;
+  border-radius: 7px;
   background: #fff;
   box-shadow: none;
   font-size: 1rem;
@@ -1398,6 +1977,13 @@ html[data-hero-logo='in'] .topbar .brand {
   top: 50%;
   right: 14px;
   translate: 0 -50%;
+}
+
+/* Desktop hero: let the photo show. The pale wash is much lighter now, so the sea and hills keep their colour. */
+@media (min-width: 768px) {
+  .home-hero::after {
+    background: rgb(236 244 255 / 0.3);
+  }
 }
 
 /* ── Booking form on wide screens: two even columns ──────────────────────────────────────────────────────────
@@ -1485,11 +2071,35 @@ html[data-hero-logo='in'] .topbar .brand {
   }
 }
 
+/* Desktop hero: a smaller logo and headline, and the booking form pulled up so it is seen without scrolling. */
+@media (min-width: 768px) {
+  .home-hero {
+    justify-content: flex-start;
+    min-height: 0;
+    gap: clamp(8px, 1vw, 14px);
+    padding-top: clamp(10px, 1.4vw, 18px);
+    padding-bottom: clamp(18px, 2vw, 28px);
+  }
+  .hero-logo {
+    margin-bottom: 0;
+  }
+  .hero-logo img {
+    height: clamp(40px, 3.6vw, 54px);
+  }
+  .hero-copy {
+    gap: 4px;
+  }
+  .hero-copy h1 {
+    font-size: clamp(1.5rem, 1rem + 1.3vw, 2.25rem);
+    line-height: 1.12;
+  }
+}
+
 /* Desktop (1000px and up): logo and headline on the left, the booking form on the right as one compact card. */
 @media (min-width: 1000px) {
   .home-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 540px;
+    grid-template-columns: minmax(0, 1fr) 420px;
     align-items: center;
     align-content: center;
     justify-content: stretch;
@@ -1513,73 +2123,31 @@ html[data-hero-logo='in'] .topbar .brand {
     font-size: clamp(2rem, 1.1rem + 2vw, 3rem);
     line-height: 1.1;
   }
-}
-/* Let the photo show: a much lighter wash. */
-@media (min-width: 768px) {
-  .home-hero::after {
-    background: rgb(236 246 240 / 0.3);
+  .home-hero > .bf {
+    justify-self: end;
+    width: 100%;
+    max-width: 420px;
+    margin: 0;
+  }
+  /* In a narrow card the five services sit in rows of three, so none is squeezed. */
+  .home-hero > .bf .bf-services {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
   }
 }
 
-/* Desktop form card: wider, larger text, and the four services in one row (icon above, name below). */
+/* Desktop form card: wider, with larger text. */
 @media (min-width: 1000px) {
   .home-hero {
     grid-template-columns: minmax(0, 1fr) 540px;
   }
   .home-hero > .bf {
-    justify-self: end;
-    width: 100%;
     max-width: 540px;
-    margin: 0;
     padding: 22px;
   }
-  .home-hero > .bf .bf-services {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 4px;
-    padding: 4px;
-    border-radius: 16px;
-    background: color-mix(in srgb, var(--brand, var(--red)) 9%, #fff);
-    box-shadow: none;
-  }
   .home-hero > .bf .bf-service {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    min-height: 64px;
-    padding: 7px 4px 6px;
-    border: 0;
-    border-radius: 13px;
-    background: transparent;
-    box-shadow: none;
-    color: var(--ink);
-    font-size: 0.8125rem;
-    font-weight: 700;
-    line-height: 1.15;
-    text-align: center;
-  }
-  .home-hero > .bf .bf-service > span:not(.bf-service__icon) {
-    display: block;
-    max-width: 100%;
-    white-space: normal;
-  }
-  .home-hero > .bf .bf-service__icon {
-    width: 30px;
-    height: 30px;
-    margin: 0;
-    border-radius: 10px;
-    background: #fff;
-    color: var(--brand, var(--red));
-  }
-  .home-hero > .bf .bf-service.is-active {
-    background: var(--brand, var(--red));
-    color: #fff;
-  }
-  .home-hero > .bf .bf-service.is-active .bf-service__icon {
-    background: rgb(255 255 255 / 0.2);
-    color: #fff;
+    font-size: 1rem;
   }
   .home-hero > .bf .bf-journey.tabs .tab {
     min-height: 50px;
@@ -1614,6 +2182,79 @@ html[data-hero-logo='in'] .topbar .brand {
   }
 }
 
+/* Desktop form card: the five services in one row, each with the icon above and the name below. */
+@media (min-width: 1000px) {
+  .home-hero > .bf .bf-services {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+    padding: 6px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--brand) 9%, #fff);
+    box-shadow: none;
+  }
+  .home-hero > .bf .bf-service {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 82px;
+    padding: 10px 4px 9px;
+    border-radius: 6px;
+    background: transparent;
+    box-shadow: none;
+    color: var(--ink);
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+  }
+  .home-hero > .bf .bf-service > span:not(.bf-service__icon) {
+    display: block;
+    max-width: 100%;
+    white-space: normal;
+  }
+  .home-hero > .bf .bf-service__icon {
+    width: 38px;
+    height: 38px;
+    margin: 0;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--brand);
+  }
+  .home-hero > .bf .bf-service.is-active {
+    background: var(--brand);
+    box-shadow: none;
+    color: #fff;
+  }
+  .home-hero > .bf .bf-service.is-active .bf-service__icon {
+    background: rgb(255 255 255 / 0.2);
+    color: #fff;
+  }
+}
+
+/* Desktop service bar: a more compact outer size. */
+@media (min-width: 1000px) {
+  .home-hero > .bf .bf-services {
+    gap: 4px;
+    padding: 4px;
+    border-radius: 6px;
+  }
+  .home-hero > .bf .bf-service {
+    min-height: 64px;
+    gap: 4px;
+    padding: 7px 4px 6px;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+  }
+  .home-hero > .bf .bf-service__icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+  }
+}
+
 /* Local Rental has a single place field and no dotted line: the green dot sits inside the card, before the text. */
 .bf .bf-form .bf-route.bf-route--single .bf-pin {
   position: relative;
@@ -1624,17 +2265,6 @@ html[data-hero-logo='in'] .topbar .brand {
   translate: none;
 }
 
-/* Desktop: the logo sits on the left, on the same edge as the headline under it (it was centred by auto margins). */
-@media (min-width: 1000px) {
-  .home-hero > .hero-copy .hero-logo {
-    justify-content: flex-start;
-    margin: 0 0 16px;
-  }
-  .home-hero > .hero-copy .hero-logo img {
-    height: clamp(52px, 4.4vw, 68px);
-  }
-}
-
 /* Desktop and tablet hero: the logo and the headline sit on a white card, so they read clearly over the photo. */
 @media (min-width: 768px) {
   .home-hero > .hero-copy {
@@ -1642,7 +2272,7 @@ html[data-hero-logo='in'] .topbar .brand {
     width: fit-content;
     max-width: 100%;
     padding: clamp(16px, 1.8vw, 26px) clamp(20px, 2.4vw, 34px);
-    border-radius: 20px;
+    border-radius: 8px;
     background: #fff;
   }
 }
@@ -1656,7 +2286,7 @@ html[data-hero-logo='in'] .topbar .brand {
   width: auto;
   max-width: none;
   margin: 0 14px 10px;
-  border-radius: 14px;
+  border-radius: 6px;
   box-shadow: none;
 }
 .topbar .ride-banner > .wrap {
@@ -1693,7 +2323,7 @@ html[data-hero-logo='in'] .topbar .brand {
   text-decoration: none;
 }
 .ride-chip--soft {
-  background: var(--brand-soft, #eef3ff);
+  background: var(--brand-soft, var(--brand-soft));
   color: var(--ink);
 }
 .ride-chip > svg {
@@ -1749,7 +2379,7 @@ html[data-hero-logo='in'] .ride-chip {
   min-height: 64px;
   padding: 9px 14px 9px 16px;
   border: 1px solid var(--bfx-line, #d9dfe9);
-  border-radius: 18px;
+  border-radius: 7px;
   background: #fff;
   box-shadow: none;
   overflow: visible;
@@ -1828,7 +2458,7 @@ html[data-hero-logo='in'] .ride-chip {
   gap: 8px;
   min-height: 46px;
   border: 1.5px dashed color-mix(in srgb, var(--bfx, var(--brand, var(--red))) 40%, #cfd6e4);
-  border-radius: 18px;
+  border-radius: 7px;
   background: color-mix(in srgb, var(--bfx, var(--brand, var(--red))) 5%, #fff);
   color: var(--ink, #20252d);
   font-size: 0.9375rem;
@@ -1861,7 +2491,7 @@ html[data-hero-logo='in'] .ride-chip {
   min-height: 48px;
   padding: 0 46px;
   border: 1px solid var(--bfx-line, #d9dfe9);
-  border-radius: 18px;
+  border-radius: 7px;
   background: transparent;
   box-shadow: none;
   font-size: 1rem;
@@ -1909,7 +2539,7 @@ html[data-hero-logo='in'] .ride-chip {
   min-height: 48px;
   padding: 0 46px;
   border: 1px solid var(--bfx-line, #d9dfe9);
-  border-radius: 18px;
+  border-radius: 7px;
   background: #fff;
   box-shadow: none;
   font-size: 1rem;
@@ -1929,7 +2559,7 @@ html[data-hero-logo='in'] .ride-chip {
 .bf .bf-form .bf-stop-field .bf-field__main { min-width: 0; }
 .bf .bf-form .bf-stop-field .bf-stop-remove { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; padding: 0; border: 1px solid color-mix(in srgb, var(--danger, #d92d20) 30%, transparent); border-radius: 50%; background: color-mix(in srgb, var(--danger, #d92d20) 6%, white); color: var(--danger, #d92d20); cursor: pointer; }
 .bf .bf-form .bf-stop-field .bf-stop-remove:hover { background: color-mix(in srgb, var(--danger, #d92d20) 12%, white); }
-.bf .bf-form .bf-round-stop-add { min-height: 46px; margin-left: 26px; border: 1px dashed var(--bfx, #2563eb); border-radius: 18px; background: color-mix(in srgb, var(--bfx, #2563eb) 5%, white); color: var(--ink, #20252d); display: flex; align-items: center; justify-content: center; gap: 8px; font: inherit; cursor: pointer; }
+.bf .bf-form .bf-round-stop-add { min-height: 46px; margin-left: 26px; border: 1px dashed var(--bfx, var(--brand)); border-radius: 7px; background: color-mix(in srgb, var(--bfx, var(--brand)) 5%, white); color: var(--ink, #20252d); display: flex; align-items: center; justify-content: center; gap: 8px; font: inherit; cursor: pointer; }
 .bf .bf-form .bf-round-stop-add svg { color: #e8344c; }
 @media (max-width: 560px) {
   .bf .bf-multicity .bf-datewrap .bf-input,
@@ -2001,7 +2631,7 @@ html[data-hero-logo='in'] .ride-chip {
   padding: 0 18px;
   gap: 6px;
   border: 1.5px solid color-mix(in srgb, var(--bfx) 35%, #d9dfe9);
-  border-radius: 12px;
+  border-radius: 6px;
   background: #fff;
   color: var(--ink, #20252d);
   font-size: 0.9375rem;
@@ -2050,7 +2680,7 @@ html[data-hero-logo='in'] .ride-chip {
   max-height: 80dvh;
   padding-bottom: env(safe-area-inset-bottom, 0px);
   border: 0;
-  border-radius: 22px 22px 0 0;
+  border-radius: 9px 9px 0 0;
   animation: pin-sheet-up 300ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .dialog.pin-sheet.is-closing {
@@ -2124,7 +2754,7 @@ html[data-hero-logo='in'] .ride-chip {
   width: 100%;
   padding: 11px 14px 11px 12px;
   border: 1px solid var(--pick-line);
-  border-radius: 16px;
+  border-radius: 6px;
   background: var(--pick-bg);
   color: var(--ink, #20252d);
   font: inherit;
@@ -2158,7 +2788,7 @@ html[data-hero-logo='in'] .ride-chip {
   place-items: center;
   width: 44px;
   height: 44px;
-  border-radius: 14px;
+  border-radius: 6px;
   background: var(--pick-tile);
   color: var(--pick-ink);
 }
@@ -2181,6 +2811,62 @@ html[data-hero-logo='in'] .ride-chip {
   flex: none;
   margin-left: auto;
   color: var(--pick-ink);
+}
+
+/* Review: the coupon sits inside the Payment Method card; fare details is a small "i" beside the total. */
+.rv-pay-promo {
+  margin-top: 6px;
+  padding-top: 4px;
+  border-top: 1px solid var(--line, #e2e6ec);
+}
+.rv-pay-promo .promo {
+  display: flex;
+  justify-content: center;
+}
+.rv-pay-promo .promo .btn--text {
+  min-height: 0;
+  padding: 2px 6px;
+  gap: 4px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.rv-pay-promo .promo .btn--text svg {
+  width: 11px;
+  height: 11px;
+}
+.rv-pay-promo .promo-form {
+  gap: 6px;
+  padding: 4px 0 2px;
+}
+.rv-pay-promo .promo-form .input {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+}
+.rv-pay-promo .promo-chip {
+  padding: 2px 8px;
+  font-size: 0.6875rem;
+}
+.rv-total-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.rv-info-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--brand, #0d8a45) 35%, #fff);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--brand, #0d8a45) 8%, #fff);
+  color: var(--brand, #0d8a45);
+  cursor: pointer;
+}
+.rv-info-btn:hover {
+  background: color-mix(in srgb, var(--brand, #0d8a45) 16%, #fff);
 }
 
 /* Confirmation page: Home and View Booking in one compact row. */
@@ -2226,8 +2912,8 @@ html[data-hero-logo='in'] .ride-chip {
   min-height: 38px;
   margin: 0;
   padding: 0 18px;
-  border: 1.5px solid color-mix(in srgb, var(--bfx, var(--brand, #1665e8)) 35%, #d9dfe9);
-  border-radius: 12px;
+  border: 1.5px solid color-mix(in srgb, var(--bfx, var(--brand, #0d8a45)) 35%, #d9dfe9);
+  border-radius: 6px;
   background: #fff;
   color: var(--ink, #20252d);
   font: inherit;
@@ -2236,7 +2922,7 @@ html[data-hero-logo='in'] .ride-chip {
   cursor: pointer;
 }
 .bf .bf-multicity .bf-round-stop-add svg {
-  color: var(--bfx, var(--brand, #1665e8));
+  color: var(--bfx, var(--brand, #0d8a45));
 }
 .bf .bf-multicity .bf-round-stop-add.is-invalid {
   border-color: var(--danger, #d92d20);
@@ -2257,7 +2943,7 @@ html[data-hero-logo='in'] .ride-chip {
   min-height: 44px;
   padding: 0 12px;
   border: 1.5px solid #d9dfe9;
-  border-radius: 14px;
+  border-radius: 6px;
   background: #fff;
   color: var(--ink, #20252d);
   font: inherit;
@@ -2277,7 +2963,7 @@ html[data-hero-logo='in'] .ride-chip {
   color: #11773a;
 }
 .cabx-fuelbar__btn:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--brand, #1665e8) 40%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--brand, #0d8a45) 40%, transparent);
   outline-offset: 2px;
 }
 

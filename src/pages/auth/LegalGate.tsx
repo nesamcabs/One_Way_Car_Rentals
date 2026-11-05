@@ -45,10 +45,8 @@ export function LegalGate({ active, children }: { active: boolean; children: Rea
         setOpen(s.missing[0]!.key);
         setBodies(Object.fromEntries(entries));
         setState('needed');
-      } catch (err) {
-        // Not being able to read the status must not lock the rider out (same as the customer app).
-        // Keep the reason visible to whoever debugs a failing endpoint.
-        console.warn('Could not check terms acceptance (getLegalStatus):', err);
+      } catch {
+        // Not being able to read the status must not lock the rider out.
         if (alive) setState('ok');
       }
     })();

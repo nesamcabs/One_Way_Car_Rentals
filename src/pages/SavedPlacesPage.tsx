@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { GeoPlace, LocationItem } from '@core/types';
-import { useCustomerData } from '@/state/customer';
+import { useCustomerData } from '@core/context/CustomerData';
 import { deleteSavedPlace, savePlace } from '@core/services/userService';
 import { describeError } from '@core/utils/retry';
 import { Button, Dialog, EmptyState, Notice, PageHead, Segmented, TextField } from '@/components/ui';

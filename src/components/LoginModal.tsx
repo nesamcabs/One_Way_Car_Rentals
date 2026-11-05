@@ -16,7 +16,7 @@ const OTP_LENGTH = 6;
 
 const agreement = (
   <p className="login-modal__agree">
-    By continuing you agree to One Way Car Rentals’{' '}
+    By continuing you agree to One Way Car Rentals’s{' '}
     <Link to="/legal#terms" target="_blank" rel="noopener">
       Terms &amp; Conditions<span className="sr-only"> (opens in a new tab)</span>
     </Link>{' '}
@@ -342,4 +342,3 @@ export function LoginModal() {
     </Dialog>
   );
 }
-

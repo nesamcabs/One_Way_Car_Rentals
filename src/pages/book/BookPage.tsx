@@ -1,7 +1,9 @@
 import { ReviewsSection, CatalogSection } from '../../../../user/web/src/components/PublicContentSections';
 import { useCallback, useEffect, useRef } from 'react';
-import { Link, Navigate, useLocation, useSearchParams } from 'react-router-dom';
-import { useCustomerData } from '@/state/customer';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
+import type { TripType } from '@core/types';
+import { useCustomerData } from '@core/context/CustomerData';
+import { useAuth } from '@/state/Auth';
 import { useBooking } from '@/state/Booking';
 import { useSeo } from '@/lib/seo';
 import { useExitGuard } from '@/lib/exitGuard';
@@ -12,8 +14,6 @@ import { parseService, serviceOfTrip, type ServiceId } from '@/lib/services';
 import { BookingForm } from './BookingForm';
 import { ChooseStep } from './ChooseStep';
 import { ReviewStep } from './ReviewStep';
-import { SignInRequired } from './SignInRequired';
-import { useAuth } from '@/state/Auth';
 import {
   AssuranceSection,
   Banners,
@@ -41,7 +41,7 @@ const writeOutstation = (t: 'One Way' | 'Round Trip') => {
   try {
     sessionStorage.setItem(OUTSTATION_KEY, t);
   } catch {
-    /* private mode */
+    // ignore
   }
 };
 
@@ -65,10 +65,10 @@ function HeroCopy() {
   return (
     <div className="hero-copy">
       <div className="hero-logo" ref={logo}>
-        <img src="/brand/one-way-car-rentals-logo.png" alt="One Way Car Rentals" width={168} height={56} />
+        <img src="/brand/one-way-car-rentals-logo.png" alt="One Way Car Rentals" width={224} height={52} />
       </div>
       <h1>
-        Reliable outstation travel, <span className="hero-accent">made simple.</span>
+        Dependable rides, <span className="hero-accent">for every journey.</span>
       </h1>
       {/* Decoration for tablets and wider: a route that runs around the booking card, pickup to drop. */}
       <svg className="hero-route" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true" focusable="false">
@@ -85,9 +85,12 @@ function Home() {
   const { draft, update } = useBooking();
   const [params, setParams] = useSearchParams();
   const rawService = params.get('service');
-  const fromUrl = parseService(rawService);
   const tripParam = params.get('trip');
-  const service: ServiceId = fromUrl ?? serviceOfTrip(draft.tripType);
+
+  // Parse service, mapping legacy 'one-way' / 'round-trip' to 'outstation'
+  const service: ServiceId = parseService(rawService) ?? serviceOfTrip(draft.tripType);
+
+  // Determine outstation trip ('One Way' | 'Round Trip')
   const outstationTrip: 'One Way' | 'Round Trip' =
     tripParam === 'round-trip' || rawService === 'round-trip'
       ? 'Round Trip'
@@ -95,22 +98,21 @@ function Home() {
         ? 'One Way'
         : draft.tripType === 'Round Trip'
           ? 'Round Trip'
-          : draft.tripType === 'One Way'
-            ? 'One Way'
-            : readOutstation();
-  const lastOutstation = useRef(outstationTrip);
+          : readOutstation();
 
   useEffect(() => {
     if (service === 'multicity') return;
-    const wanted =
+    const wanted: TripType =
       service === 'airport'
         ? 'Airport Taxi'
-        : service === 'rental'
+        : service === 'local'
+          ? 'One Way'
+          : service === 'rental'
           ? 'Local Rental'
           : outstationTrip === 'Round Trip'
             ? 'Round Trip'
             : 'One Way';
-    if (!wanted || wanted === draft.tripType) return;
+    if (wanted === draft.tripType) return;
     update((d) => ({
       tripType: wanted,
       drop: d.drop?.id === 'place-local-disposal' && wanted !== 'Local Rental' ? null : d.drop,
@@ -129,21 +131,21 @@ function Home() {
     [setParams, outstationTrip],
   );
 
-  const onOutstationTrip = (t: 'One Way' | 'Round Trip') => {
-    lastOutstation.current = t;
-    try {
-      sessionStorage.setItem(OUTSTATION_KEY, t);
-    } catch {
-      /* private mode */
-    }
-    update({ tripType: t, tripEndAt: t === 'Round Trip' ? draft.tripEndAt : null });
-    setParams({ service: 'outstation', trip: t === 'Round Trip' ? 'round-trip' : 'one-way' }, { replace: true });
-  };
+  const onOutstationTrip = useCallback(
+    (t: 'One Way' | 'Round Trip') => {
+      writeOutstation(t);
+      update((d) => ({
+        tripType: t,
+        tripEndAt: t === 'Round Trip' ? d.tripEndAt : null,
+      }));
+      setParams({ service: 'outstation', trip: t === 'Round Trip' ? 'round-trip' : 'one-way' }, { replace: true });
+    },
+    [setParams, update],
+  );
 
-  const location = useLocation();
   const scrollToConsole = useCallback(() => scrollToBookingForm(), []);
 
-  // When a service query param is present or changes, sync outstation preference and scroll to console
+  // When a service or outstation trip type is selected via URL query params, sync preference and scroll up to the console
   useEffect(() => {
     if (tripParam === 'round-trip' || rawService === 'round-trip') {
       writeOutstation('Round Trip');
@@ -157,18 +159,20 @@ function Home() {
       }, 120);
       return () => window.clearTimeout(timer);
     }
-  }, [location.search, rawService, tripParam, scrollToConsole]);
+  }, [rawService, tripParam, scrollToConsole]);
 
   const onRoute = (c: Corridor) => {
-    update({ pickup: c.pickup, drop: c.drop, tripType: outstationTrip });
-    setParams({ service: 'outstation' }, { replace: true });
+    update({ pickup: c.pickup, drop: c.drop, tripType: 'One Way' });
+    writeOutstation('One Way');
+    setParams({ service: 'outstation', trip: 'one-way' }, { replace: true });
     scrollToConsole();
     window.setTimeout(() => document.getElementById('bf-date')?.focus({ preventScroll: true }), 400);
   };
 
   const onDestination = (d: Destination) => {
-    update({ drop: d.place, tripType: outstationTrip });
-    setParams({ service: 'outstation' }, { replace: true });
+    update({ drop: d.place, tripType: 'One Way' });
+    writeOutstation('One Way');
+    setParams({ service: 'outstation', trip: 'one-way' }, { replace: true });
     scrollToConsole();
   };
 
@@ -176,6 +180,7 @@ function Home() {
     if (s.id === 'airport') onService('airport');
     else if (s.id === 'local-rental') onService('rental');
     else if (s.id === 'round-trip') onOutstationTrip('Round Trip');
+    else if (s.id === 'multicity') onService('multicity');
     else onOutstationTrip('One Way');
     scrollToConsole();
   };
@@ -236,10 +241,13 @@ export function BookPage({ step }: { step: BookStep }) {
   const { pickup, drop } = draft;
 
   if (step !== 'plan' && (!pickup || !drop)) return <Navigate to="/book" replace />;
-  if (step !== 'plan' && auth.status !== 'ready') return <SignInRequired />;
+  // Fares need a signed-in account: a guest on a later step goes back to the form (draft intact),
+  // where "Search Cabs" asks them to sign in and then resumes vehicle selection.
+  if (step !== 'plan' && auth.status !== 'ready') return <Navigate to="/book" replace />;
   if (step === 'review' && !draft.categoryId) return <Navigate to="/book/ride" replace />;
 
   if (step === 'choose') return <ChooseStep />;
   if (step === 'review') return <ReviewStep />;
   return <Home />;
 }
+export default BookPage;

@@ -1,7 +1,7 @@
 // What each public page tells search engines. The pages call useSeo() with these, and the build
 // writes the same tags into each page's prerendered HTML — one source for both.
 import { FAQS } from '../pages/book/content';
-import type { RouteGuide } from '../pages/routes/routesData';
+import type { RouteCorridorDetail } from '../pages/routes/routesData';
 import type { ServiceDetail } from '../pages/services/servicesData';
 import { SITE, absoluteUrl, faqSchema, type SeoProps } from './site';
 
@@ -16,16 +16,15 @@ export const HOME_SEO: SeoProps = {
 };
 
 export const OFFERS_SEO: SeoProps = {
-  title: 'Offers & Promo Codes on One Way Taxi Bookings',
+  title: 'Offers, Coupons & Promo Codes',
   description:
-    'Current promo codes and discounts on One Way Car Rentals one way drops, outstation round trips and airport taxis. Apply a code before you confirm your booking.',
+    'Save on your next outstation cab or drop taxi booking with One Way Car Rentals promo codes, festive discounts and new user coupons.',
   canonical: '/offers',
 };
 
 export const SUPPORT_SEO: SeoProps = {
   title: 'Customer Support & 24/7 Helpline',
-  description:
-    'Help with a One Way Car Rentals booking or a trip in progress. Call +91 90250 99990 any time, or raise a ticket from your account.',
+  description: 'Help with a One Way Car Rentals booking or a trip in progress. Call +91 90250 99990 any time, or raise a ticket from your account.',
   canonical: '/support',
 };
 
@@ -41,23 +40,23 @@ export const LEGAL_SEO: SeoProps = {
   canonical: '/legal',
 };
 
-export function routeSeo(r: RouteGuide): SeoProps {
+export function routeSeo(r: RouteCorridorDetail): SeoProps {
   const path = `/routes/${r.slug}`;
   return {
     title: r.title,
     description: r.metaDescription,
     keywords: r.keywords,
     canonical: path,
-    ogImage: r.imageUrl,
-    ogImageAlt: `${r.origin} to ${r.destination} one way taxi`,
+    ogImage: r.image,
+    ogImageAlt: `${r.origin} to ${r.destination} taxi`,
     breadcrumbs: [
       { name: 'Home', path: '/' },
-      { name: `${r.origin} to ${r.destination} taxi`, path },
+      { name: `${r.origin} to ${r.destination}`, path },
     ],
     schema: [
       {
         '@type': 'TaxiService',
-        name: `${r.origin} to ${r.destination} one way taxi`,
+        name: r.h1,
         description: r.summary,
         url: absoluteUrl(path),
         provider: { '@id': `${SITE.url}/#business` },
@@ -78,11 +77,11 @@ export function serviceSeo(s: ServiceDetail): SeoProps {
     description: s.metaDescription,
     keywords: s.keywords,
     canonical: path,
-    ogImage: s.imageUrl,
+    ogImage: s.image,
     ogImageAlt: s.h1,
     breadcrumbs: [
       { name: 'Home', path: '/' },
-      { name: s.name, path },
+      { name: s.h1, path },
     ],
     schema: [
       {

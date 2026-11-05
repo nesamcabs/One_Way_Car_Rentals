@@ -12,4 +12,5 @@ export function composeNotes(p: { flight?: string; passengerName?: string; passe
   return (head && note ? `${head} | ${note}` : head || note).slice(0, NOTES_MAX);
 }
 
-export const notesRoom = (p: { flight?: string; passengerName?: string; passengerMobile?: string }) => Math.max(0, NOTES_MAX - (composeNotes(p).length + (composeNotes(p) ? 3 : 0)));
+export const notesRoom = (p: { flight?: string; passengerName?: string; passengerMobile?: string }) =>
+  Math.max(0, NOTES_MAX - (composeNotes(p).length + (composeNotes(p) ? 3 : 0)));

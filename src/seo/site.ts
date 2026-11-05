@@ -98,6 +98,7 @@ export function siteSchema(): object {
         '@id': id,
         name: SITE.name,
         legalName: SITE.legalName,
+        parentOrganization: { '@type': 'Organization', name: SITE.legalName, url: 'https://nesamcabs.com/' },
         url: `${SITE.url}/`,
         logo: absoluteUrl(SITE.logo),
         image: absoluteUrl(SITE.image),

@@ -1,4 +1,4 @@
-// Terms & privacy: the customer documents One Way Car Rentals has published, the version in force and
+// Terms & privacy: the customer documents NESAM has published, the version in force and
 // whether this account has accepted it (acceptance itself happens in LegalGate when a new
 // version is published).
 import { useEffect, useState } from 'react';

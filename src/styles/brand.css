@@ -1,0 +1,155 @@
+/* One Way Car Rentals — "Fresh and structured" identity. Loaded last.
+   Clean emerald on white, strong condensed capitals for headlines, flat square-edged surfaces, hairline borders and a
+   firm green rule across the top. Layout, behaviour and wording are shared with the other customer sites
+   (see theme.css); this file only restates this brand's look. */
+
+/* ── Headlines: condensed capitals with a green marker ───────────────────────────────────────────── */
+h1,
+h2,
+.display-h,
+.hx-head h2,
+.sec-heading h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.hx-head h2::after,
+.sec-heading h2::after,
+.routes__head .display-h::after,
+.why__intro .display-h::after,
+.faq__intro .display-h::after {
+  content: none;
+}
+.hx-head h2,
+.sec-heading h2,
+.routes__head .display-h,
+.why__intro .display-h,
+.faq__intro .display-h {
+  padding-left: 12px;
+  border-left: 4px solid var(--brand);
+  line-height: 1.1;
+}
+
+/* ── Header: a firm green rule on top ────────────────────────────────────────────────────────────── */
+.topbar {
+  border-top: 3px solid var(--brand);
+}
+
+/* ── Buttons: solid, flat, capitals ──────────────────────────────────────────────────────────────── */
+.btn {
+  border-radius: var(--r-md);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.btn--primary {
+  border-color: var(--brand);
+  background: var(--brand);
+  box-shadow: none;
+}
+.btn--primary:hover:not(:disabled) {
+  border-color: var(--brand-hover);
+  background: var(--brand-hover);
+  filter: none;
+}
+
+/* ── Booking form: square tabs, solid green when chosen ──────────────────────────────────────────── */
+.bf-services {
+  border-radius: var(--r-md);
+}
+.bf-service {
+  border-radius: var(--r-md);
+  font-weight: 700;
+}
+.bf-service.is-active,
+.bf-service.is-active:hover {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+  box-shadow: none;
+}
+.bf-journey.tabs,
+.bf-journey.tabs .tab {
+  border-radius: var(--r-md);
+}
+.bf-submit,
+.bf-add-city {
+  border-radius: var(--r-md);
+}
+
+/* ── Footer, phone bar, side menu ────────────────────────────────────────────────────────────────── */
+.footer {
+  border-top: 4px solid var(--brand);
+}
+.footer h2 {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.tabbar,
+.bottom-nav {
+  border-top: 2px solid var(--brand);
+}
+.drawer__call,
+.drawer__quick a {
+  border-radius: var(--r-md);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Assistant ───────────────────────────────────────────────────────────────────────────────────── */
+.floating-ai-launcher--oneway,
+.ai-chat-window--oneway .ai-chat-head {
+  background: var(--brand);
+}
+
+/* ── Header: a flat full-width bar instead of a floating pill ────────────────────────────────────── */
+.topbar {
+  padding: 0 var(--gutter);
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  box-shadow: none;
+  pointer-events: auto;
+}
+.topbar__inner {
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+@media (max-width: 899.98px) {
+  .topbar {
+    padding-top: 0;
+  }
+  .topbar__inner {
+    height: 100%;
+    padding: 0;
+  }
+}
+
+/* ── Cards: flat white with a hairline edge (no pastel washes) ───────────────────────────────────── */
+.strip__item:nth-child(n),
+.assure__list li:nth-child(n) {
+  background: #fff;
+  border: 1px solid var(--line);
+}
+.svc:nth-child(n),
+.vehicle:nth-child(n) {
+  --wash: #fff;
+}
+.svc,
+.vehicle,
+.strip__item,
+.assure__list li {
+  box-shadow: none;
+}
+
+/* ── Elevation: borders do most of the work ──────────────────────────────────────────────────────── */
+:root {
+  --shadow-1: 0 1px 2px rgb(15 23 19 / 0.06);
+  --shadow-2: 0 3px 10px rgb(15 23 19 / 0.07);
+}

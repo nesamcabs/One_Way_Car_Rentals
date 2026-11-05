@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { SupportTicket } from '@core/types';
-import { useCustomerData } from '@/state/customer';
+import { useCustomerData } from '@core/context/CustomerData';
 import { SUPPORT_CATEGORIES, submitSupportTicket, subscribeToSupportTickets } from '@core/services/userService';
 import { SUPPORT_PHONE, SUPPORT_PHONE_DISPLAY } from '@core/config/constants';
 import { describeError } from '@core/utils/retry';
@@ -169,8 +169,8 @@ export function SupportPage() {
                 ) : (
                   <ul className="card card--list">
                     {tickets.map((t) => (
-                      <li key={t.id} className="support-ticket">
-                        <div className="support-ticket__head">
+                      <li key={t.id} className="ticket">
+                        <div className="ticket__head">
                           <strong>{t.category || 'Support request'}</strong>
                           <Badge tone={t.status === 'Resolved' || t.status === 'Closed' ? 'green' : t.status === 'In Progress' ? 'blue' : 'amber'} dot>
                             {t.status}
