@@ -1,0 +1,245 @@
+import { ReviewsSection, CatalogSection } from '../../../../user/web/src/components/PublicContentSections';
+import { useCallback, useEffect, useRef } from 'react';
+import { Link, Navigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useCustomerData } from '@/state/customer';
+import { useBooking } from '@/state/Booking';
+import { useSeo } from '@/lib/seo';
+import { useExitGuard } from '@/lib/exitGuard';
+import { scrollToBookingForm } from '@/lib/scrollToForm';
+import { HOME_SEO } from '@/seo/pages';
+import { Icon } from '@/components/Icon';
+import { parseService, serviceOfTrip, type ServiceId } from '@/lib/services';
+import { BookingForm } from './BookingForm';
+import { ChooseStep } from './ChooseStep';
+import { ReviewStep } from './ReviewStep';
+import { SignInRequired } from './SignInRequired';
+import { useAuth } from '@/state/Auth';
+import {
+  AssuranceSection,
+  Banners,
+  DestinationsSection,
+  FaqSection,
+  FleetSection,
+  HowSection,
+  RoutesSection,
+  ServicesSection,
+  TrustStrip,
+} from './HomeSections';
+import { type Corridor, type Destination, type Service } from './content';
+
+export type BookStep = 'plan' | 'choose' | 'review';
+
+const OUTSTATION_KEY = 'ow.outstation.trip';
+const readOutstation = (): 'One Way' | 'Round Trip' => {
+  try {
+    return sessionStorage.getItem(OUTSTATION_KEY) === 'Round Trip' ? 'Round Trip' : 'One Way';
+  } catch {
+    return 'One Way';
+  }
+};
+const writeOutstation = (t: 'One Way' | 'Round Trip') => {
+  try {
+    sessionStorage.setItem(OUTSTATION_KEY, t);
+  } catch {
+    /* private mode */
+  }
+};
+
+function HeroCopy() {
+  // While the logo shows in the hero the header leaves its own logo out; once the page scrolls past it, the header takes over.
+  const logo = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = logo.current;
+    const root = document.documentElement;
+    if (!el || typeof IntersectionObserver === 'undefined') return undefined;
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry) root.dataset.heroLogo = entry.isIntersecting ? 'in' : 'out';
+    }, { rootMargin: '-72px 0px 0px 0px' });
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      delete root.dataset.heroLogo;
+    };
+  }, []);
+
+  return (
+    <div className="hero-copy">
+      <div className="hero-logo" ref={logo}>
+        <img src="/brand/one-way-car-rentals-logo.png" alt="One Way Car Rentals" width={168} height={56} />
+      </div>
+      <h1>
+        Reliable outstation travel, <span className="hero-accent">made simple.</span>
+      </h1>
+      {/* Decoration for tablets and wider: a route that runs around the booking card, pickup to drop. */}
+      <svg className="hero-route" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path className="hero-route__line" d="M640 120 C 800 60, 960 110, 968 330 S 975 800, 930 940 S 800 962, 600 955 S 250 975, 40 955" />
+        <path className="hero-route__comet" pathLength="100" d="M640 120 C 800 60, 960 110, 968 330 S 975 800, 930 940 S 800 962, 600 955 S 250 975, 40 955" />
+      </svg>
+      <span className="hero-pin hero-pin--a" aria-hidden="true" />
+      <span className="hero-pin hero-pin--b" aria-hidden="true" />
+    </div>
+  );
+}
+
+function Home() {
+  const { draft, update } = useBooking();
+  const [params, setParams] = useSearchParams();
+  const rawService = params.get('service');
+  const fromUrl = parseService(rawService);
+  const tripParam = params.get('trip');
+  const service: ServiceId = fromUrl ?? serviceOfTrip(draft.tripType);
+  const outstationTrip: 'One Way' | 'Round Trip' =
+    tripParam === 'round-trip' || rawService === 'round-trip'
+      ? 'Round Trip'
+      : tripParam === 'one-way' || rawService === 'one-way'
+        ? 'One Way'
+        : draft.tripType === 'Round Trip'
+          ? 'Round Trip'
+          : draft.tripType === 'One Way'
+            ? 'One Way'
+            : readOutstation();
+  const lastOutstation = useRef(outstationTrip);
+
+  useEffect(() => {
+    if (service === 'multicity') return;
+    const wanted =
+      service === 'airport'
+        ? 'Airport Taxi'
+        : service === 'rental'
+          ? 'Local Rental'
+          : outstationTrip === 'Round Trip'
+            ? 'Round Trip'
+            : 'One Way';
+    if (!wanted || wanted === draft.tripType) return;
+    update((d) => ({
+      tripType: wanted,
+      drop: d.drop?.id === 'place-local-disposal' && wanted !== 'Local Rental' ? null : d.drop,
+      tripEndAt: wanted === 'Round Trip' ? d.tripEndAt : null,
+    }));
+  }, [service, outstationTrip]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const onService = useCallback(
+    (s: ServiceId) => {
+      if (s === 'outstation') {
+        setParams({ service: 'outstation', trip: outstationTrip === 'Round Trip' ? 'round-trip' : 'one-way' }, { replace: true });
+      } else {
+        setParams({ service: s }, { replace: true });
+      }
+    },
+    [setParams, outstationTrip],
+  );
+
+  const onOutstationTrip = (t: 'One Way' | 'Round Trip') => {
+    lastOutstation.current = t;
+    try {
+      sessionStorage.setItem(OUTSTATION_KEY, t);
+    } catch {
+      /* private mode */
+    }
+    update({ tripType: t, tripEndAt: t === 'Round Trip' ? draft.tripEndAt : null });
+    setParams({ service: 'outstation', trip: t === 'Round Trip' ? 'round-trip' : 'one-way' }, { replace: true });
+  };
+
+  const location = useLocation();
+  const scrollToConsole = useCallback(() => scrollToBookingForm(), []);
+
+  // When a service query param is present or changes, sync outstation preference and scroll to console
+  useEffect(() => {
+    if (tripParam === 'round-trip' || rawService === 'round-trip') {
+      writeOutstation('Round Trip');
+    } else if (tripParam === 'one-way' || rawService === 'one-way') {
+      writeOutstation('One Way');
+    }
+    if (rawService || tripParam) {
+      scrollToConsole();
+      const timer = window.setTimeout(() => {
+        scrollToConsole();
+      }, 120);
+      return () => window.clearTimeout(timer);
+    }
+  }, [location.search, rawService, tripParam, scrollToConsole]);
+
+  const onRoute = (c: Corridor) => {
+    update({ pickup: c.pickup, drop: c.drop, tripType: outstationTrip });
+    setParams({ service: 'outstation' }, { replace: true });
+    scrollToConsole();
+    window.setTimeout(() => document.getElementById('bf-date')?.focus({ preventScroll: true }), 400);
+  };
+
+  const onDestination = (d: Destination) => {
+    update({ drop: d.place, tripType: outstationTrip });
+    setParams({ service: 'outstation' }, { replace: true });
+    scrollToConsole();
+  };
+
+  const onServiceCard = (s: Service) => {
+    if (s.id === 'airport') onService('airport');
+    else if (s.id === 'local-rental') onService('rental');
+    else if (s.id === 'round-trip') onOutstationTrip('Round Trip');
+    else onOutstationTrip('One Way');
+    scrollToConsole();
+  };
+
+  return (
+    <div className="home">
+      <div className="wrap home__wrap">
+        <div className="home-hero">
+          <HeroCopy />
+          <BookingForm
+            service={service}
+            onService={onService}
+            outstationTrip={outstationTrip}
+            onOutstationTrip={onOutstationTrip}
+          />
+        </div>
+      </div>
+
+      <div className="hero-after">
+        <TrustStrip />
+        <ServicesSection onPick={onServiceCard} />
+        <RoutesSection onRoute={onRoute} />
+        <DestinationsSection onPick={onDestination} />
+        <FleetSection onPick={scrollToConsole} />
+        <HowSection />
+        <AssuranceSection />
+        <Banners />
+        <ReviewsSection brand="One Way Car Rentals" />
+        <CatalogSection brand="One Way Car Rentals" />
+        <FaqSection />
+      </div>
+    </div>
+  );
+}
+
+export function BookPage({ step }: { step: BookStep }) {
+  useExitGuard(step === 'plan');
+  useSeo(
+    step === 'plan'
+      ? HOME_SEO
+      : step === 'choose'
+        ? {
+            title: 'Choose Vehicle & Upfront Fares · One Way Car Rentals',
+            description: 'Compare every vehicle category with its upfront fare before you book.',
+            canonical: '/book/ride',
+            noindex: true,
+          }
+        : {
+            title: 'Review and Confirm Booking · One Way Car Rentals',
+            description: 'Review your trip itinerary, passenger details and transparent fare before submission.',
+            canonical: '/book/confirm',
+            noindex: true,
+          },
+  );
+
+  const { draft } = useBooking();
+  const { state: auth } = useAuth();
+  const { pickup, drop } = draft;
+
+  if (step !== 'plan' && (!pickup || !drop)) return <Navigate to="/book" replace />;
+  if (step !== 'plan' && auth.status !== 'ready') return <SignInRequired />;
+  if (step === 'review' && !draft.categoryId) return <Navigate to="/book/ride" replace />;
+
+  if (step === 'choose') return <ChooseStep />;
+  if (step === 'review') return <ReviewStep />;
+  return <Home />;
+}
