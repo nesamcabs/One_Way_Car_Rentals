@@ -1,4 +1,4 @@
-import { ReviewsSection, CatalogSection } from '../../../../user/web/src/components/PublicContentSections';
+import { ReviewsSection, CatalogSection } from '@/shared/components/PublicContentSections';
 import { useCallback, useEffect, useRef } from 'react';
 import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import type { TripType } from '@core/types';

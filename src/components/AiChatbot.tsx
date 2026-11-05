@@ -1,6 +1,6 @@
 // One Way Car Rentals AI travel guide. The chat itself is shared (see user/web AiChatWidget); this is this
 // site's wording and icons.
-import { AiChatWidget, type ChatBrand } from '../../../user/web/src/components/AiChatWidget';
+import { AiChatWidget, type ChatBrand } from '@/shared/components/AiChatWidget';
 import { Icon } from './Icon';
 
 const BRAND: ChatBrand = {

@@ -7,7 +7,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   resolve: {
     alias: {
-      '@core': path.resolve(here, '../user/app/src'),
+      '@core': path.resolve(here, 'src/core'),
       '@': path.resolve(here, 'src'),
     },
   },

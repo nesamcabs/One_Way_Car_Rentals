@@ -18,7 +18,7 @@ import { useAuth } from '@/state/Auth';
 import { setPendingReturn } from '@/lib/pendingReturn';
 import { saveDraft, RENTAL_PACKAGE_HOURS } from '@/lib/draft';
 import { useDeviceLocation, useOnline } from '@/lib/hooks';
-import { ClockIcon, SwapIcon } from '../../../../user/web/src/components/CabParts';
+import { ClockIcon, SwapIcon } from '@/shared/components/CabParts';
 import { combineDateTime, latestPickup, toDateInput, toTimeInput } from '@/lib/schedule';
 import { SERVICES, SERVICE_TITLE, type ServiceId } from '@/lib/services';
 import { AIRPORTS, QUICK_CITIES, isAirportPlace } from './content';

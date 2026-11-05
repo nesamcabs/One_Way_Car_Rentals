@@ -2,12 +2,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
-import { aiChatDev } from '../user/web/scripts/ai-chat-dev';
+import { aiChatDev } from './scripts/ai-chat-dev';
 import { seoPrerender } from './scripts/seo-prerender';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const slashes = (p: string) => p.split(path.sep).join('/');
-const appSrc = slashes(path.resolve(here, '../user/app/src'));
+const appSrc = slashes(path.resolve(here, './src/core'));
 
 /**
  * The website reuses the customer app's pricing, booking, Firestore and callable
@@ -55,7 +55,7 @@ export default defineConfig(({ mode }) => {
     envPrefix: ['VITE_', 'EXPO_PUBLIC_'],
     resolve: {
       alias: {
-        '@core': path.resolve(here, '../user/app/src'),
+        '@core': path.resolve(here, './src/core'),
         '@': path.resolve(here, 'src'),
         'expo-location': path.resolve(here, 'src/platform/expoLocation.ts'),
       },
@@ -70,7 +70,7 @@ export default defineConfig(({ mode }) => {
       host: '0.0.0.0',
       ...(proxyFunctions ? { proxy: functionsProxy } : {}),
       port: Number(process.env.PORT || 8084),
-      fs: { allow: [here, path.resolve(here, '../user/app'), path.resolve(here, '../user/web/src/components')] },
+      fs: { allow: [here, path.resolve(here, './src/core'), path.resolve(here, './src/shared/components')] },
     },
     preview: { host: '0.0.0.0', port: Number(process.env.PORT || 8084), ...(proxyFunctions ? { proxy: functionsProxy } : {}) },
     build: {

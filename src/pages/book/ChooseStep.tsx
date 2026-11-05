@@ -12,7 +12,7 @@ import { useBooking, useBookingQuote } from '@/state/Booking';
 import { useOnline } from '@/lib/hooks';
 import { categoryGroup, categoryName, categoryPhoto, type CategoryGroup } from '@/lib/categories';
 import { tripTypeLabel } from '@/lib/services';
-import { CabIcon, FuelPick, type FuelChoice } from '../../../../user/web/src/components/CabParts';
+import { CabIcon, FuelPick, type FuelChoice } from '@/shared/components/CabParts';
 import { FareDialog, FlowBar, PromoControl } from './parts';
 
 const TOO_FAR_KM = 1500;

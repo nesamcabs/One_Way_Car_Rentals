@@ -2,7 +2,7 @@
 // return schedule. "Let's Go" turns it into a booking draft (a Round Trip through those cities, priced from the Multicity
 // rates) and opens the normal flow: cabs with their fares, review, then Confirm booking.
 import { useEffect, useMemo, useState } from 'react';
-import { ClockIcon } from '../../../../user/web/src/components/CabParts';
+import { ClockIcon } from '@/shared/components/CabParts';
 import { useNavigate } from 'react-router-dom';
 import type { GeoPlace } from '@core/types';
 import { scheduleProblem } from '@core/utils/bookingRules';

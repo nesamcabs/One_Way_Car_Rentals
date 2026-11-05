@@ -27,7 +27,7 @@ import './styles/localtaxi.css';
 import './styles/theme.css';
 import './styles/brand.css';
 import { keepHomeBehindEveryScreen } from './lib/homeNav';
-import { installStaleVersionReload, installVersionCheck } from '../../user/web/src/components/RouteErrorBoundary';
+import { installStaleVersionReload, installVersionCheck } from '@/shared/components/RouteErrorBoundary';
 import { App } from './App';
 
 keepHomeBehindEveryScreen();

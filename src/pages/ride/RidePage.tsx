@@ -1,4 +1,4 @@
-import { TripItinerary } from '../../../../user/web/src/components/TripItinerary';
+import { TripItinerary } from '@/shared/components/TripItinerary';
 // Live ride and trip details: map, status timeline, driver and vehicle, boarding code,
 // what to pay, support — then the receipt and rating once the trip is done. Everything
 // shown comes from the booking document and the driver's own live location; nothing is

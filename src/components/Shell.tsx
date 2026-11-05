@@ -12,7 +12,7 @@ import { SERVICES, parseService, serviceHref, serviceOfTrip, type ServiceId } fr
 import { Avatar, Button, Dialog, PageLoader } from './ui';
 import { Icon } from './Icon';
 import { RideBanner } from './RideBanner';
-import { RouteErrorBoundary } from '../../../user/web/src/components/RouteErrorBoundary';
+import { RouteErrorBoundary } from '@/shared/components/RouteErrorBoundary';
 import { FloatingCallButton } from './FloatingCallButton';
 import { SideDrawer } from './SideDrawer';
 import { AiChatbot } from './AiChatbot';
