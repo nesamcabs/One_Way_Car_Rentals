@@ -28,6 +28,7 @@ import './styles/theme.css';
 import './styles/brand.css';
 import './styles/bottom-nav.css';
 import './styles/desktop-controls.css';
+import './styles/scroll-header.css';
 import { keepHomeBehindEveryScreen } from './lib/homeNav';
 import { installStaleVersionReload, installVersionCheck } from '@/shared/components/RouteErrorBoundary';
 import { App } from './App';
