@@ -27,6 +27,7 @@ import './styles/localtaxi.css';
 import './styles/theme.css';
 import './styles/brand.css';
 import './styles/bottom-nav.css';
+import './styles/desktop-controls.css';
 import { keepHomeBehindEveryScreen } from './lib/homeNav';
 import { installStaleVersionReload, installVersionCheck } from '@/shared/components/RouteErrorBoundary';
 import { App } from './App';
