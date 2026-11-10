@@ -35,6 +35,20 @@ function vehicleTypeAliases(...labels: string[]): string[] {
   return [...out];
 }
 
+/** This site's brand: a category can carry a car image of its own per brand (admin → Vehicle categories). */
+const SITE_BRAND = 'onewaycarrentals';
+const brandImage = (d: DocumentData): string => {
+  const images = d.brandImages;
+  return images && typeof images === 'object' ? str((images as Record<string, unknown>)[SITE_BRAND]) : '';
+};
+
+/** Admin → Vehicle categories decides per brand which categories this site offers (older records without the list are offered everywhere). */
+const offeredOnThisSite = (d: DocumentData): boolean => {
+  if (Array.isArray(d.brands) && !d.brands.includes(SITE_BRAND)) return false;
+  const status = d.brandStatus;
+  return !(status && typeof status === 'object' && (status as Record<string, unknown>)[SITE_BRAND] === 'Inactive');
+};
+
 /** Exported for the server-parity test. */
 export function mapCategory(id: string, d: DocumentData): RideCategory | null {
   const f = d.fare && typeof d.fare === 'object' ? d.fare : {};
@@ -48,7 +62,7 @@ export function mapCategory(id: string, d: DocumentData): RideCategory | null {
     name: str(d.name),
     description: str(d.description),
     seats: num(d.seatingCapacity) || num(d.recommendedPassengers) || 4,
-    imageUrl: str(d.imageUrl) || undefined,
+    imageUrl: brandImage(d) || str(d.imageUrl) || undefined,
     iconUrl: str(d.iconUrl) || undefined,
     matchVehicleTypes: vehicleTypeAliases(str(d.name), str(d.code)),
     fare: {
@@ -174,30 +188,21 @@ export const SPEC_DEFAULT_CATEGORIES: RideCategory[] = [
 
 export type RideCategoryStatus = 'loading' | 'ready' | 'unavailable' | 'error';
 
-/**
- * Live list of bookable categories — falls back to standard NTT/DEV-SPEC 2.0
- * fleet so online booking is ALWAYS available without waiting for Firestore config.
- */
+/** Live list of admin-configured bookable categories. */
 export function subscribeToRideCategories(cb: (cats: RideCategory[], status: RideCategoryStatus) => void, configuredOnly = false): () => void {
-  if (configuredOnly) {
-    cb([], 'loading');
-    return onSnapshot(query(collection(db, 'vehicle_categories'), where('status', '==', 'Active')), snap => {
-      const cats = snap.docs.map(d => mapCategory(d.id, d.data())).filter((category): category is RideCategory => !!category)
-        .sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
-      cb(cats, 'ready');
-    }, () => cb([], 'error'));
-  }
-  cb(SPEC_DEFAULT_CATEGORIES, 'ready');
+  void configuredOnly;
+  cb([], 'loading');
   return onSnapshot(
     query(collection(db, 'vehicle_categories'), where('status', '==', 'Active')),
     (snap) => {
       const cats = snap.docs
+        .filter((d) => offeredOnThisSite(d.data()))
         .map((d) => mapCategory(d.id, d.data()))
         .filter((c): c is RideCategory => !!c)
         .sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
-      cb(cats.length ? cats : SPEC_DEFAULT_CATEGORIES, 'ready');
+      cb(cats, cats.length ? 'ready' : 'unavailable');
     },
-    () => cb(SPEC_DEFAULT_CATEGORIES, 'ready'),
+    () => cb([], 'error'),
   );
 }
 

@@ -11,7 +11,7 @@ import type { TripRecord, TripType } from '@core/types';
 import { BookingConfirmedOverlay } from '@/components/BookingConfirmedOverlay';
 import './done.css';
 
-const BRAND_LOGO = { src: '/brand/one-way-car-rentals-logo.png', alt: 'One Way Car Rentals' };
+const BRAND_LOGO = { src: '/brand/one-way-car-rentals-logo.webp', alt: 'One Way Car Rentals' };
 
 function JourneyArt({ done }: { done: boolean }) {
   return (

@@ -35,8 +35,8 @@ function AuthLayout({ art, title, subtitle, children }: { art: string; title: st
           <span className="brand brand--light brand--compact">
             <img src="/brand/ow-icon-192.png" alt="" width={44} height={44} />
             <span className="brand__word">
-              <b>People</b>
-              <small>Taxi</small>
+              <b>One Way</b>
+              <small>Car Rentals</small>
             </span>
           </span>
         </div>
