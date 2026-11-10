@@ -58,6 +58,44 @@
   .tabbar__link.is-active .tabbar__icon::before { opacity: 1; transform: scale(1); }
   .tabbar__link.is-active .tabbar__img { animation: tabbar-selected-pop 350ms ease-out; }
   .tabbar__link:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; border-radius: 12px; }
+
+  /* Policy pages: the bar holds the back button and the heading instead of the services. */
+  .tabbar.tabbar--policy {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 64px;
+    padding: 0 16px 0 10px;
+    border-radius: 24px;
+  }
+  .tabbar__back {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px 8px 10px;
+    border-radius: 999px;
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+    font-weight: 800;
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+  .tabbar__back:hover { text-decoration: none; background: var(--brand-tint); }
+  .tabbar__title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.0625rem;
+    line-height: 1.15;
+    text-align: right;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+  /* The heading now lives in the bar, and the bar is slimmer than the service dock. */
+  .shell--policy .page-head { display: none; }
+  .shell--policy.shell--dock .main { padding-bottom: calc(64px + 32px + env(safe-area-inset-bottom, 0px)); }
 }
 @keyframes tabbar-selected-pop {
   from { transform: scale(.85); }
