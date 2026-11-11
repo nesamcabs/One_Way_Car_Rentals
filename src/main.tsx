@@ -33,6 +33,7 @@ import './styles/contact-controls.css';
 import './styles/bookform-date.css';
 import './styles/support-menu.css';
 import './styles/bookform-route.css';
+import './styles/account.css';
 import { keepHomeBehindEveryScreen } from './lib/homeNav';
 import { installStaleVersionReload, installVersionCheck } from '@/shared/components/RouteErrorBoundary';
 import { prefetchWhenIdle, registerDeviceCache } from '@/lib/deviceCache';
