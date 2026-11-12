@@ -18,7 +18,7 @@ import { useBooking } from '@/state/Booking';
 import { useAuth } from '@/state/Auth';
 import { saveDraft, RENTAL_PACKAGE_HOURS } from '@/lib/draft';
 import { setPendingReturn } from '@/lib/pendingReturn';
-import { useDeviceLocation, useMinWidth, useOnline } from '@/lib/hooks';
+import { useDeviceLocation, useLivePickupDefault, useMinWidth, useOnline } from '@/lib/hooks';
 import { LOCATION_HELP, combineDateTime, earliestSlot, latestPickup, pickupTimeOptions, toDateInput, toTimeInput } from '@/lib/schedule';
 import { useSeo } from '@/lib/seo';
 import { QUICK_CITIES } from '@/pages/book/content';
@@ -302,7 +302,7 @@ function LocalRentalsSheet() {
   const [params] = useSearchParams();
   const { draft, update } = useBooking();
   const { state: auth, openLoginModal } = useAuth();
-  const { position, locate, locating, error: locationError, permission } = useDeviceLocation(true);
+  const { position, locate, locating, error: locationError, permission } = useDeviceLocation(true, true);
   useEffect(() => { void locate(); }, [locate]);
   const { online } = useOnline();
 
@@ -318,6 +318,12 @@ function LocalRentalsSheet() {
   // The pickup starts at the earliest time a rider may book: 30 minutes after the device clock, rounded up to 5 minutes.
   const [date, setDate] = useState(() => toDateInput(future ?? earliestSlot()));
   const [time, setTime] = useState(() => toTimeInput(future ?? earliestSlot()));
+  // Until the rider picks a date or time, the default keeps following the clock (always 30 minutes from now).
+  const scheduleTouched = useRef(future !== null);
+  useLivePickupDefault(scheduleTouched, (next) => {
+    setDate(next.date);
+    setTime(next.time);
+  });
   const [nowMs, setNowMs] = useState(() => Date.now());
   const [stage, setStage] = useState<Stage>('pickup');
   const [cand, setCand] = useState<GeoPlace | null>(null);
@@ -328,6 +334,8 @@ function LocalRentalsSheet() {
   // The plan sheet can be pulled down to its button so the whole map shows.
   const [peek, setPeek] = useState(false);
   const [error, setError] = useState('');
+  /** Shown when the device could only give a rough position (Wi-Fi / network), so a wrong-looking pin is explained. */
+  const [approx, setApprox] = useState('');
   const [sheetH, setSheetH] = useState(240);
   const seq = useRef(0);
   const resolveToken = useRef(0);
@@ -336,7 +344,6 @@ function LocalRentalsSheet() {
 
   const picking = stage !== 'when';
   const steps = mode === 'hourly' ? 2 : 3;
-  const stepNo = stage === 'pickup' ? 1 : stage === 'drop' ? 2 : steps;
 
   const flyTo = useCallback((ll: LatLng, zoom = 16) => setTarget({ lat: ll.lat, lng: ll.lng, zoom, n: ++seq.current }), []);
 
@@ -424,6 +431,7 @@ function LocalRentalsSheet() {
   };
 
   const confirmStage = () => {
+    setApprox('');
     if (!cand) return;
     if (stage === 'pickup') {
       setPickup(cand);
@@ -452,8 +460,10 @@ function LocalRentalsSheet() {
     flyTo(p, 16);
   };
   const useMyLocation = async () => {
+    setApprox('');
     const p = await locate();
     if (!p) return;
+    if (p.accuracy > 1000) setApprox(`Your device gave only an approximate location (about ${p.accuracy >= 10000 ? `${Math.round(p.accuracy / 1000)} km` : `${(p.accuracy / 1000).toFixed(1)} km`}). Move the map to place the pin exactly.`);
     flyTo({ lat: p.lat, lng: p.lng });
     if (stage === 'when') return; // the trip is already set; just show the rider where they are
     userMoved.current = true;
@@ -477,6 +487,7 @@ function LocalRentalsSheet() {
   const timeOptions = useMemo(() => pickupTimeOptions(date, TIME_SLOTS, nowMs), [date, nowMs]);
   const timeOk = (t: string) => !scheduleProblem(combineDateTime(date, t), nowMs);
   const pickDate = (iso: string) => {
+    scheduleTouched.current = true;
     setDate(iso);
     setError('');
     if (time && scheduleProblem(combineDateTime(iso, time))) setTime(iso === firstDay ? firstTime : '');
@@ -555,6 +566,7 @@ function LocalRentalsSheet() {
             value={time}
             onChange={(e) => {
               if (e.target.value === '__other') { setTimeOpen(true); return; }
+              scheduleTouched.current = true;
               setTime(e.target.value);
               setError('');
             }}
@@ -629,15 +641,14 @@ function LocalRentalsSheet() {
       <div className="lr-dock" ref={dock}>
         {stage !== 'when' ? (
           <section key={stage} className="lr-sheet" aria-label={stage === 'drop' ? 'Set drop location' : 'Set pickup location'}>
-            <span className="lr-grip" aria-hidden="true" />
-            <p className="lr-step">Step {stepNo} of {steps}</p>
+            {modeSeg}
+            {approx && !locating ? <p className="lr-hint" role="status">{approx}</p> : null}
             {locating ? <p className="lr-hint" role="status">Finding your current location…</p> : askLocation ? (
               <div className={`lr-perm ${locationError || permission === 'denied' || permission === 'blocked' ? 'is-warn' : ''}`} role={locationError ? 'alert' : 'status'}>
                 <p>{locationNote}</p>
                 {secure ? <button type="button" onClick={() => void useMyLocation()}>{permission === 'prompt' && !locationError ? 'Allow location' : 'Try again'}</button> : null}
               </div>
             ) : null}
-            <h2>{stage === 'drop' ? 'Where should we drop you?' : mode === 'hourly' ? 'Where should the car meet you?' : 'Where should we pick you up?'}</h2>
             <div className="lr-row">
             <div className={`lr-addr ${resolving ? 'is-busy' : ''}`}>
               <span className={`lr-dot lr-dot--${stage === 'drop' ? 'to' : 'from'}`} aria-hidden="true" />
@@ -658,7 +669,6 @@ function LocalRentalsSheet() {
               {resolving ? 'Finding address…' : stage === 'drop' ? 'Confirm drop' : 'Confirm pickup'}
             </button>
             </div>
-            {modeSeg}
             {farApart ? <p className="lr-warn" role="alert">Pickup &amp; Drop is for trips inside one city. For a longer trip choose Outstation.</p> : null}
             {stage === 'drop' ? <button type="button" className="lr-link" onClick={() => enter('pickup')}>Change pickup</button> : null}
           </section>
@@ -667,6 +677,7 @@ function LocalRentalsSheet() {
             <button type="button" className="lr-gripbtn" aria-label={peek ? 'Show the trip details' : 'Show more of the map'} aria-expanded={!peek} onClick={() => setPeek((p) => !p)} />
             <p className="lr-step">Step {steps} of {steps}</p>
             <h2>{mode === 'hourly' ? 'Plan your rental' : 'Plan your trip'}</h2>
+            {modeSeg}
 
             <div className="lr-body">
             <div className="lr-trip">
@@ -683,7 +694,6 @@ function LocalRentalsSheet() {
                 </button>
               ) : null}
             </div>
-            {modeSeg}
 
             {mode === 'hourly' ? (
               <div className="lr-hourly-plan">
@@ -717,7 +727,7 @@ function LocalRentalsSheet() {
 
       {pickerFor}
       {timeOpen ? (
-        <TimePicker title="Pickup time" date={date} value={time} validate="pickup" onClose={() => setTimeOpen(false)} onConfirm={(t) => { setTime(t); setError(''); setTimeOpen(false); }} />
+        <TimePicker title="Pickup time" date={date} value={time} validate="pickup" onClose={() => setTimeOpen(false)} onConfirm={(t) => { scheduleTouched.current = true; setTime(t); setError(''); setTimeOpen(false); }} />
       ) : null}
     </div>
   );
