@@ -60,21 +60,6 @@ const barServices = () => BAR_ORDER.flatMap((id) => SERVICES.find((s) => s.id ==
 const SHORT_LABEL: Partial<Record<ServiceId, string>> = { airport: 'Airport', multicity: 'Multicity', outstation: 'Outstation', rental: 'Local' };
 const NAV_ICON: Partial<Record<ServiceId, string>> = { airport: airportIcon, multicity: multicityIcon, outstation: outstationIcon, rental: rentalIcon };
 
-/** Policy pages: on phones the bottom bar carries the back button and the page heading instead of the service tabs. */
-const POLICY_PAGE = /^\/legal\/?$/;
-
-function PolicyBar() {
-  const { profile } = useCustomerData();
-  return (
-    <nav className="tabbar tabbar--policy" aria-label="Policies">
-      <Link to={profile ? '/account' : '/'} className="tabbar__back">
-        <Icon name="arrow-left" size={18} /> {profile ? 'Account' : 'Home'}
-      </Link>
-      <h1 className="tabbar__title">Terms, privacy and policies</h1>
-    </nav>
-  );
-}
-
 function BottomNav() {
   const location = useLocation();
   const [params] = useSearchParams();
@@ -472,7 +457,6 @@ export function Shell() {
   useEffect(() => setMenuOpen(false), [location.pathname]);
   const isFlow = FLOW.some((re) => re.test(location.pathname));
   const isImmersive = IMMERSIVE.some((re) => re.test(location.pathname));
-  const isPolicy = POLICY_PAGE.test(location.pathname);
   const isLocalPage = /^\/local-(rentals|taxi)\/?$/.test(location.pathname);
   const isLanding = location.pathname === '/' || location.pathname === '/book' || isLocalPage;
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -495,7 +479,7 @@ export function Shell() {
   }, [location.pathname]);
 
   return (
-    <div className={`shell ${isLanding ? 'shell--scroll-header' : ''} ${isLocalPage ? 'shell--local-page' : ''} ${isImmersive ? 'shell--immersive' : ''} ${isPolicy ? 'shell--policy' : ''} ${isFlow ? '' : 'shell--dock'}`}>
+    <div className={`shell ${isLanding ? 'shell--scroll-header' : ''} ${isLocalPage ? 'shell--local-page' : ''} ${isImmersive ? 'shell--immersive' : ''} ${isFlow ? '' : 'shell--dock'}`}>
       <a
         className="skip-link"
         href="#main"
@@ -600,7 +584,7 @@ export function Shell() {
         {!isImmersive ? <Footer /> : null}
       </Suspense>
 
-      {isPolicy ? <PolicyBar /> : !isFlow ? <BottomNav /> : null}
+      {!isFlow ? <BottomNav /> : null}
       <SideDrawer open={menuOpen} onClose={() => setMenuOpen(false)} brand={<Brand />} />
       {/* Support lives in the header (Ask AI / Call us): no floating buttons to cover fares or actions. */}
       <AiChatbot
