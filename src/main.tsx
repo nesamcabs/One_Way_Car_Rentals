@@ -50,6 +50,7 @@ prefetchWhenIdle([
   () => import('@/pages/ride/RidePage'),
   () => import('@/pages/TripsPage'),
   () => import('@/pages/localTaxi/LocalTaxiPage'),
+  () => import('@/pages/localRentals/LocalRentalsPage'),
   () => import('@/pages/AccountPage'),
 ]);
 
