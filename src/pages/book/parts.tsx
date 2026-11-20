@@ -1,37 +1,10 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import type { FareBreakdown as Fare, FareLine, PaymentMethod } from '@core/types';
+import { useState, type ReactNode } from 'react';
+import type { FareBreakdown as Fare, FareLine } from '@core/types';
 import type { FareBreakup } from '@core/utils/fareBreakup';
 import { formatINR } from '@core/utils/format';
 import { Button, Dialog } from '@/components/ui';
 import { Icon } from '@/components/Icon';
 import { FareBreakdown } from '@/components/FareBreakdown';
-
-/** One way to pay: book now, pay the driver at the end of the trip. Recorded as Cash, whatever an older draft held. */
-export function PaymentChoice({
-  value,
-  onChange,
-  disabled,
-}: {
-  value: PaymentMethod;
-  onChange: (m: PaymentMethod) => void;
-  disabled?: boolean;
-}) {
-  useEffect(() => {
-    if (value !== 'Cash') onChange('Cash');
-  }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
-  return (
-    <div className="pay-opts" role="radiogroup" aria-label="Payment mode">
-      <label className="pay-opt is-selected">
-        <input type="radio" name="pay" value="Cash" checked readOnly disabled={disabled} />
-        <div className="pay-opt__text">
-          <strong>Book now, pay later</strong>
-          <small>Pay your driver at the end of the trip.</small>
-        </div>
-        <Icon name="wallet" size={20} />
-      </label>
-    </div>
-  );
-}
 
 export function PromoControl({
   code,
